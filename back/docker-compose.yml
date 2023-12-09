@@ -1,0 +1,36 @@
+
+version: '3'
+
+
+services:
+
+  backend:
+    build: ./flask
+    restart: always
+    expose:
+      - 5000
+
+
+  mysql:
+    container_name: mysql
+    image: mysql
+    restart: always
+    ports:
+      - 3306:3306
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: polywine
+      MYSQL_USER: user
+      MYSQL_PASSWORD: user
+    volumes:
+      - ./sql:/docker-entrypoint-initdb.d
+
+  adminer:
+      image: adminer
+      restart: always
+      ports:
+        - 8080:8080
+
+
+

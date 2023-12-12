@@ -1,15 +1,16 @@
 
 version: '3'
 
-
 services:
-
-  backend:
-    build: ./flask
-    restart: always
-    expose:
-      - 5000
-
+  api-flask:
+    build: ./flask/
+    volumes:
+      - ./flask/:/usr/src/app/
+    ports:
+      - 5000:5000
+    environment:
+      PORT: 5000
+      FLASK_DEBUG: 1
 
   mysql:
     container_name: mysql
@@ -31,6 +32,4 @@ services:
       restart: always
       ports:
         - 8080:8080
-
-
 

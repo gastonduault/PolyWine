@@ -9,7 +9,7 @@
 >>      - *send* **json**: `{username, password}`
 >>      - *receive* **json**: `{[id_cave, nom_cave]}`
 >
->>- **[POST]** `api/newlogin`
+>>- **[POST]** `api/signin`
 >>     - *send* **json**: `{username, password}`
 >
 >>- **[POST]** `api/login/cave`

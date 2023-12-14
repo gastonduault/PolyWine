@@ -2,6 +2,22 @@
 
 ----
 
+## TODO
+> #### Vladou
+> - **[FINI]** mise en place projet flutter
+> - **[EN COURS]** frontend app flutter
+> - **[EN COURS]** apprendre flutter
+> - **[A COMMENCER]** connection bluethoot flutter <> casier vin
+
+> #### Gaston
+> - **[FINI]** Dockerisation mysql & python Flask
+> - **[EN COURS]** base de donnée sql
+> - **[EN COURS]** requête SQL Flask <> mysql-service
+> - **[A COMMENCER]** requête HTTP Flutter <> Flask
+> - **[A COMMENCER]** frontend app flutter
+
+
+
 ## BACK
 
 >#### endpoints :

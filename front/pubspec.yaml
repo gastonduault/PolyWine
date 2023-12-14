@@ -8,7 +8,7 @@ environment:
 
 dependencies:
   flutter:
-    sdk: flutte
+    sdk: flutter
   
   google_fonts: ^6.1.0
 

@@ -49,7 +49,7 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
       ),
-      backgroundColor: Colors.red,
+      backgroundColor: Colors.blue,
     );
   }
 }

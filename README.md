@@ -17,6 +17,9 @@
 > - **[A COMMENCER]** frontend app flutter
 
 ## Cahier des charges 
+> - 🔨 : en cours
+> - ✅ : fini 
+
 > #### USE CASES
 > 1. Se connecter à une cave à vin
 >     - 1.1 Supprimer une cave à vin		

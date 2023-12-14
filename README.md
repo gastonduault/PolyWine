@@ -12,7 +12,7 @@
 > #### Gaston
 > - **[FINI]** Dockerisation mysql & python Flask
 > - **[EN COURS]** base de donnée sql
-> - **[EN COURS]** requête SQL Flask <> mysql-service
+> - **[EN COURS]** requête SQL Flask(SQLAlchemy) <> mysql-service
 > - **[A COMMENCER]** requête HTTP Flutter <> Flask
 > - **[A COMMENCER]** frontend app flutter
 

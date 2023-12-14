@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-const d_pink = Color(0xFFFFF6F6);
+const d_pink = Color(0xFFFEEBEB); // Couleur principale maquette 
 
 void main() {
   runApp(MainApp());
@@ -25,8 +25,14 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: MyAppBar(),
-      body: Container(
-        color: d_pink,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            SearchSection(),
+            InfosSection(),
+            BouteilleSection(),
+          ],
+        ),
       ),
     );
   }
@@ -37,19 +43,88 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override 
   Widget build(BuildContext context) {
     return AppBar(
-      title: Align(
-        alignment: Alignment.center,
-        child: Text(
-          'Que recherchez-vous ?',
-          style: GoogleFonts.montserrat(
+      leading: const IconButton(
+        icon: Icon(
+          Icons.arrow_back,
+          color: Colors.black,
+          size: 24,
+        ),
+        onPressed: null,
+      ),
+      title: Text(
+          'Home page',
+          style: GoogleFonts.lato(
             color: Colors.black,
             fontSize: 24,
-            fontWeight: FontWeight.w600,
-            
+            fontWeight: FontWeight.w700,
           ),
         ),
+      actions: const [
+        IconButton(
+        icon: Icon(
+          Icons.home,
+          color: Colors.black,
+          size: 24,
+        ),
+        onPressed: null,
       ),
-      backgroundColor: Colors.blue,
+      ],
+      centerTitle: true,
+      backgroundColor: Colors.white,
+    );
+  }
+}
+
+class SearchSection extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.red[50],
+      padding: const EdgeInsets.fromLTRB(10, 20, 10, 20),
+      child: Column(
+        children: [
+          Container(
+            height: 50,
+            color: Colors.blue,
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  height: 50,
+                  color: Colors.green[300],
+                  // child: const TextField(),
+                )
+              ),
+              Container(
+                height: 50,
+                width: 60,
+                color: Colors.green,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class InfosSection extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 125,
+      color: Colors.red[100],
+    );
+  }
+}
+
+class BouteilleSection extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 1500,
+      color: Colors.red[200],
     );
   }
 }

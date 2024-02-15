@@ -1,17 +1,16 @@
 import os
 from flask import Flask, session, render_template, request, url_for, redirect, flash
-from flask_sqlalchemy import SQLAlchemy
+# from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config
-db = SQLAlchemy(app)
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
+# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# app.config
+# db = SQLAlchemy(app)
 
 @app.route('/')
 def home():
     print("Try to connect to the db ... ")
-
     return "end"
 
 

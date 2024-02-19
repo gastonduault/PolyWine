@@ -5,6 +5,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://user:user@mysql/polywine'
 db = SQLAlchemy(app)
 
+
 class Bouteille(db.Model):
     __tablename__ = 'bouteilles'
     id = db.Column(db.Integer, primary_key=True)
@@ -38,6 +39,23 @@ def add_cave():
             db.session.close()
 
 
+@app.route('/cave/<int:caveid>', methods=['GET'])
+def get_bouteilles_by_cave(caveid):
+    bouteilles = Bouteille.query.filter_by(caveId=caveid).all()
+    bouteilles_list = []
+    for bouteille in bouteilles:
+        bouteilles_list.append({
+            'nom': bouteille.nom,
+            'cuvee': bouteille.cuvee,
+            'region': bouteille.region,
+            'categorie': bouteille.categorie,
+            'date_recolte': bouteille.date_recolte,
+            'date_ajout': bouteille.date_ajout.strftime('%Y-%m-%d'),
+            'caveId': bouteille.caveId
+        })
+    return jsonify({'bouteilles': bouteilles_list})
+
+
 @app.route('/bouteilles', methods=['POST'])
 def add_bouteille():
     if request.method == 'POST':
@@ -63,24 +81,34 @@ def add_bouteille():
             db.session.close()
 
 
-@app.route('/cave/<int:caveid>', methods=['GET'])
-def get_bouteilles_by_cave(caveid):
-    bouteilles = Bouteille.query.filter_by(caveId=caveid).all()
-    bouteilles_list = []
-    for bouteille in bouteilles:
-        bouteilles_list.append({
-            'nom': bouteille.nom,
-            'cuvee': bouteille.cuvee,
-            'region': bouteille.region,
-            'categorie': bouteille.categorie,
-            'date_recolte': bouteille.date_recolte,
-            'date_ajout': bouteille.date_ajout.strftime('%Y-%m-%d'),
-            'caveId': bouteille.caveId
-        })
-    return jsonify({'bouteilles': bouteilles_list})
+@app.route('/bouteilles/<int:bouteille_id>', methods=['POST'])
+def update_bouteille(bouteille_id):
+    bouteille = Bouteille.query.get(bouteille_id)
+
+    if bouteille:
+        try:
+            data = request.get_json()
+
+            bouteille.nom = data['nom']
+            bouteille.cuvee = data['cuvee']
+            bouteille.region = data['region']
+            bouteille.categorie = data['categorie']
+            bouteille.date_recolte = data['date_recolte']
+            bouteille.date_ajout = data['date_ajout']
+            bouteille.caveId = data['caveId']
+
+            db.session.commit()
+            return jsonify({'message': 'Bouteille mise à jour avec succès!'}), 200
+        except:
+            db.session.rollback()
+            return jsonify({'message': 'Erreur lors de la mise à jour de la bouteille'}), 500
+        finally:
+            db.session.close()
+    else:
+        return jsonify({'message': 'Bouteille non trouvée'}), 404
 
 
-@app.route('/bouteilles/<int:bouteille_id>', methods=['DELETE'])
+@app.route('/bouteille/<int:bouteille_id>', methods=['DELETE'])
 def delete_bouteille(bouteille_id):
     bouteille = Bouteille.query.get(bouteille_id)
     if bouteille:
@@ -99,6 +127,4 @@ def delete_bouteille(bouteille_id):
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
-
-
 

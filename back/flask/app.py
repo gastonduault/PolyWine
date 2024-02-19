@@ -22,6 +22,47 @@ class Cave(db.Model):
     nom = db.Column(db.String(50), nullable=False)
 
 
+@app.route('/caves', methods=['POST'])
+def add_cave():
+    if request.method == 'POST':
+        data = request.get_json()
+        new_cave = Cave(nom=data['nom'])
+        try:
+            db.session.add(new_cave)
+            db.session.commit()
+            return jsonify({'message': 'Cave ajoutée avec succès!'}), 201
+        except:
+            db.session.rollback()
+            return jsonify({'message': 'Erreur lors de l\'ajout de la cave'}), 500
+        finally:
+            db.session.close()
+
+
+@app.route('/bouteilles', methods=['POST'])
+def add_bouteille():
+    if request.method == 'POST':
+        data = request.get_json()
+
+        new_bouteille = Bouteille(
+            nom=data['nom'],
+            cuvee=data['cuvee'],
+            region=data['region'],
+            categorie=data['categorie'],
+            date_recolte=data['date_recolte'],
+            date_ajout=data['date_ajout'],
+            caveId=data['caveId']
+        )
+        try:
+            db.session.add(new_bouteille)
+            db.session.commit()
+            return jsonify({'message': 'Bouteille ajoutée avec succès!'}), 201
+        except:
+            db.session.rollback()
+            return jsonify({'message': 'Erreur lors de l\'ajout de la bouteille'}), 500
+        finally:
+            db.session.close()
+
+
 @app.route('/cave/<int:caveid>', methods=['GET'])
 def get_bouteilles_by_cave(caveid):
     bouteilles = Bouteille.query.filter_by(caveId=caveid).all()
@@ -39,20 +80,25 @@ def get_bouteilles_by_cave(caveid):
     return jsonify({'bouteilles': bouteilles_list})
 
 
-@app.route('/caves', methods=['POST'])
-def add_cave():
-    if request.method == 'POST':
-        data = request.get_json()
-        new_cave = Cave(nom=data['nom'])
+@app.route('/bouteilles/<int:bouteille_id>', methods=['DELETE'])
+def delete_bouteille(bouteille_id):
+    bouteille = Bouteille.query.get(bouteille_id)
+    if bouteille:
         try:
-            db.session.add(new_cave)
+            db.session.delete(bouteille)
             db.session.commit()
-            return jsonify({'message': 'Cave ajoutée avec succès!'}), 201
+            return jsonify({'message': 'Bouteille supprimée avec succès!'}), 200
         except:
             db.session.rollback()
-            return jsonify({'message': 'Erreur lors de l\'ajout de la cave'}), 500
+            return jsonify({'message': 'Erreur lors de la suppression de la bouteille'}), 500
         finally:
             db.session.close()
+    else:
+        return jsonify({'message': 'Bouteille non trouvée'}), 404
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
+
+
+

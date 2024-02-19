@@ -39,6 +39,25 @@ def add_cave():
             db.session.close()
 
 
+@app.route('/caves/<int:cave_id>', methods=['POST'])
+def update_cave(cave_id):
+    cave = Cave.query.get(cave_id)
+
+    if cave:
+        try:
+            data = request.get_json()
+            cave.nom = data['nom']
+            db.session.commit()
+            return jsonify({'message': 'Nom de la cave mis à jour avec succès!'}), 200
+        except:
+            db.session.rollback()
+            return jsonify({'message': 'Erreur lors de la mise à jour du nom de la cave'}), 500
+        finally:
+            db.session.close()
+    else:
+        return jsonify({'message': 'Cave non trouvée'}), 404
+
+
 @app.route('/cave/<int:caveid>', methods=['GET'])
 def get_bouteilles_by_cave(caveid):
     bouteilles = Bouteille.query.filter_by(caveId=caveid).all()

@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -16,7 +16,12 @@ class Bouteille(db.Model):
     date_ajout = db.Column(db.Date, nullable=False)
     caveId = db.Column(db.Integer, db.ForeignKey('caves.id'), nullable=False)
 
-# Endpoint pour lister les bouteilles de la cave de quelqu'un
+class Cave(db.Model):
+    __tablename__ = 'caves'
+    id = db.Column(db.Integer, primary_key=True)
+    nom = db.Column(db.String(50), nullable=False)
+
+
 @app.route('/cave/<int:caveid>', methods=['GET'])
 def get_bouteilles_by_cave(caveid):
     bouteilles = Bouteille.query.filter_by(caveId=caveid).all()
@@ -32,6 +37,22 @@ def get_bouteilles_by_cave(caveid):
             'caveId': bouteille.caveId
         })
     return jsonify({'bouteilles': bouteilles_list})
+
+
+@app.route('/caves', methods=['POST'])
+def add_cave():
+    if request.method == 'POST':
+        data = request.get_json()
+        new_cave = Cave(nom=data['nom'])
+        try:
+            db.session.add(new_cave)
+            db.session.commit()
+            return jsonify({'message': 'Cave ajoutée avec succès!'}), 201
+        except:
+            db.session.rollback()
+            return jsonify({'message': 'Erreur lors de l\'ajout de la cave'}), 500
+        finally:
+            db.session.close()
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

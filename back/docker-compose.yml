@@ -11,7 +11,7 @@ services:
       PORT: 5000
       FLASK_DEBUG: 1
     depends_on:
-      - mysql  
+      - mysql
 
   mysql:
     container_name: mysql
@@ -26,7 +26,8 @@ services:
       MYSQL_USER: user
       MYSQL_PASSWORD: user
     volumes:
-      - ./sql:/docker-entrypoint-initdb.d
+      - ./mysql:/docker-entrypoint-initdb.d
+      - ./mysql/logs:/var/log/mysql
 
   adminer:
     image: adminer

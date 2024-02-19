@@ -19,12 +19,12 @@ CREATE TABLE bouteilles (
     cuvee char(50) NOT NULL,
     region char(50) NOT NULL,
     categorie char(50) NOT NULL,
-    annee_recolte char(50) NOT NULL,
+    date_recolte char(50) NOT NULL,
     date_ajout date NOT NULL,
     caveId integer not null,
-    primary key (userId),
+    primary key (id),
     FOREIGN KEY (caveId) REFERENCES caves(id)
 );
 
-INSERT INTO bouteilles (nom, cuvee, region, categorie, anne_recolte, ajout_cave ,caveId) VALUES
+INSERT INTO bouteilles (nom, cuvee, region, categorie, date_recolte, date_ajout ,caveId) VALUES
 ('Vouvray', "domaine d'orsay", "Bordeaux", "rouge", "2020", "2023-12-15",  1);

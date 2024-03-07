@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'bluetooth_screen.dart';
 
 const d_pink = Color(0xFFFEEBEB); // Couleur principale maquette 
 
@@ -59,8 +60,21 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
             fontWeight: FontWeight.w700,
           ),
         ),
-      actions: const [
-        IconButton(
+      actions: [
+              IconButton(
+        icon: const Icon(
+          Icons.bluetooth,
+          color: Colors.black,
+          size: 24,
+        ),
+        onPressed: () {
+          Navigator.push(
+            context, 
+            MaterialPageRoute(builder: (context) => BluetoothScreen()),
+          );
+        },
+      ),
+        const IconButton(
         icon: Icon(
           Icons.home,
           color: Colors.black,

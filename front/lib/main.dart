@@ -1,47 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'fetch/caves.dart';
 
-Future<Album> fetchAlbum() async {
-  final response = await http
-      .get(Uri.parse('https://jsonplaceholder.typicode.com/albums/1'));
-      
-  if (response.statusCode == 200) {
-    return Album.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
-  } else {
-    throw Exception('Failed to load album');
-  }
-}
-
-class Album {
-  final int userId;
-  final int id;
-  final String title;
-
-  const Album({
-    required this.userId,
-    required this.id,
-    required this.title,
-  });
-
-  factory Album.fromJson(Map<String, dynamic> json) {
-    return switch (json) {
-      {
-        'userId': int userId,
-        'id': int id,
-        'title': String title,
-      } =>
-        Album(
-          userId: userId,
-          id: id,
-          title: title,
-        ),
-      _ => throw const FormatException('Failed to load album.'),
-    };
-  }
-}
 
 void main() => runApp(const MyApp());
 
@@ -53,12 +15,12 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  late Future<Album> futureAlbum;
+  late Future<List<Bouteille>> futureBouteilles;
 
   @override
   void initState() {
     super.initState();
-    futureAlbum = fetchAlbum();
+    futureBouteilles = fetchBouteilles();
   }
 
   @override
@@ -73,16 +35,26 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Fetch Data Example'),
         ),
         body: Center(
-          child: FutureBuilder<Album>(
-            future: futureAlbum,
+          child: FutureBuilder<List<Bouteille>>(
+            future: futureBouteilles,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                return Text(snapshot.data!.title);
+                // Afficher la liste de noms de bouteilles
+                return ListView.builder(
+                  itemCount: snapshot.data!.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text(snapshot.data![index].nom),
+                      subtitle: Text(snapshot.data![index].cuvee),
+                    );
+                  },
+                );
               } else if (snapshot.hasError) {
+                // Afficher l'erreur s'il y en a une
                 return Text('${snapshot.error}');
               }
 
-              // By default, show a loading spinner.
+              // Par défaut, afficher un spinner de chargement
               return const CircularProgressIndicator();
             },
           ),

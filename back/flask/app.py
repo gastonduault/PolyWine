@@ -58,7 +58,7 @@ def update_cave(cave_id):
         return jsonify({'message': 'Cave non trouvée'}), 404
 
 
-@app.route('/cave/<int:caveid>', methods=['GET'])
+@app.route('/cave/bouteilles/<int:caveid>', methods=['GET'])
 def get_bouteilles_by_cave(caveid):
     bouteilles = Bouteille.query.filter_by(caveId=caveid).all()
     bouteilles_list = []

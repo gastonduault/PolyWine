@@ -1,130 +1,93 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 
-const d_pink = Color(0xFFFEEBEB); // Couleur principale maquette 
-
-void main() {
-  runApp(MainApp());
+Future<Album> fetchAlbum() async {
+  final response = await http
+      .get(Uri.parse('https://jsonplaceholder.typicode.com/albums/1'));
+      
+  if (response.statusCode == 200) {
+    return Album.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+  } else {
+    throw Exception('Failed to load album');
+  }
 }
 
-class MainApp extends StatelessWidget {
-  MainApp({super.key});
+class Album {
+  final int userId;
+  final int id;
+  final String title;
+
+  const Album({
+    required this.userId,
+    required this.id,
+    required this.title,
+  });
+
+  factory Album.fromJson(Map<String, dynamic> json) {
+    return switch (json) {
+      {
+        'userId': int userId,
+        'id': int id,
+        'title': String title,
+      } =>
+        Album(
+          userId: userId,
+          id: id,
+          title: title,
+        ),
+      _ => throw const FormatException('Failed to load album.'),
+    };
+  }
+}
+
+void main() => runApp(const MyApp());
+
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late Future<Album> futureAlbum;
+
+  @override
+  void initState() {
+    super.initState();
+    futureAlbum = fetchAlbum();
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title : "PolyWine",
-      home : HomePage(),
-    );
-  }
-}
-
-class HomePage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: MyAppBar(),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            SearchSection(),
-            InfosSection(),
-            BouteilleSection(),
-          ],
-        ),
+      title: 'Fetch Data Example',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-    );
-  }
-}
-
-class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
-  Size get preferredSize => new Size.fromHeight(50);
-  @override 
-  Widget build(BuildContext context) {
-    return AppBar(
-      leading: const IconButton(
-        icon: Icon(
-          Icons.arrow_back,
-          color: Colors.black,
-          size: 24,
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('Fetch Data Example'),
         ),
-        onPressed: null,
-      ),
-      title: Text(
-          'Home page',
-          style: GoogleFonts.lato(
-            color: Colors.black,
-            fontSize: 24,
-            fontWeight: FontWeight.w700,
+        body: Center(
+          child: FutureBuilder<Album>(
+            future: futureAlbum,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Text(snapshot.data!.title);
+              } else if (snapshot.hasError) {
+                return Text('${snapshot.error}');
+              }
+
+              // By default, show a loading spinner.
+              return const CircularProgressIndicator();
+            },
           ),
         ),
-      actions: const [
-        IconButton(
-        icon: Icon(
-          Icons.home,
-          color: Colors.black,
-          size: 24,
-        ),
-        onPressed: null,
       ),
-      ],
-      centerTitle: true,
-      backgroundColor: Colors.white,
-    );
-  }
-}
-
-class SearchSection extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.red[50],
-      padding: const EdgeInsets.fromLTRB(10, 20, 10, 20),
-      child: Column(
-        children: [
-          Container(
-            height: 50,
-            color: Colors.blue,
-          ),
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  height: 50,
-                  color: Colors.green[300],
-                  // child: const TextField(),
-                )
-              ),
-              Container(
-                height: 50,
-                width: 60,
-                color: Colors.green,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class InfosSection extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 125,
-      color: Colors.red[100],
-    );
-  }
-}
-
-class BouteilleSection extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 1500,
-      color: Colors.red[200],
     );
   }
 }

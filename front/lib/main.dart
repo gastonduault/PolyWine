@@ -1,63 +1,80 @@
-import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'fetch/caves.dart';
+import 'package:provider/provider.dart';
+import 'pages/bluetooth/bluetooth.dart';
+import './colors.dart';
 
 
-void main() => runApp(const MyApp());
+void main() { runApp(MyApp()); }
 
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  late Future<List<Bouteille>> futureBouteilles;
-
-  @override
-  void initState() {
-    super.initState();
-    futureBouteilles = fetchBouteilles();
-  }
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Fetch Data Example',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Fetch Data Example'),
+    return ChangeNotifierProvider(
+      create: (context) => MyAppState(),
+      child: MaterialApp(
+        title: 'Namer App',
+        theme: ThemeData(
+          useMaterial3: true,
+          colorScheme: ColorScheme.fromSeed(seedColor: background_color),
         ),
-        body: Center(
-          child: FutureBuilder<List<Bouteille>>(
-            future: futureBouteilles,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                // Afficher la liste de noms de bouteilles
-                return ListView.builder(
-                  itemCount: snapshot.data!.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(snapshot.data![index].nom),
-                      subtitle: Text(snapshot.data![index].cuvee),
+        home: FirstRoute(),
+      ),
+    );
+  }
+}
+
+class MyAppState extends ChangeNotifier {}
+
+class FirstRoute extends StatelessWidget {
+  const FirstRoute({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Choisir une cave'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ElevatedButton(
+                  child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        Text(
+                          "Ajout Cave",
+                          style: TextStyle(color: font_black),
+                        ),
+                        SizedBox(height: 20),
+                        Icon(
+                          Icons.bluetooth,
+                          color: font_pink,
+                          size: 24.0,
+                          semanticLabel:
+                              'Text to announce in accessibility modes',
+                        ),
+                      ],
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SecondRoute(),
+                      ),
                     );
                   },
-                );
-              } else if (snapshot.hasError) {
-                // Afficher l'erreur s'il y en a une
-                return Text('${snapshot.error}');
-              }
-
-              // Par défaut, afficher un spinner de chargement
-              return const CircularProgressIndicator();
-            },
-          ),
+                ),
+              ],
+            )
+          ],
         ),
       ),
     );

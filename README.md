@@ -5,7 +5,7 @@
 ## TODO
 > #### Vladou
 > - **[FINI]** mise en place projet flutter
-> - **[FINI]** apprendre flutter
+> - **[FINI]** choix plugins bluetooth
 > - **[EN COURS]** connection bluethoot flutter <> casier vin
 > - **[EN COURS]** frontend app flutter
 

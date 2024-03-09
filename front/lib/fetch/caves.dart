@@ -1,6 +1,6 @@
-import 'url.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'url.dart';
 
 
 class Bouteille {
@@ -36,8 +36,8 @@ class Bouteille {
 }
 
 
-Future<List<Bouteille>> fetchBouteilles() async {
-  final response = await http.get(Uri.parse(url+'cave/bouteilles/1'));
+Future<List<Bouteille>> fetchBouteilles(int id) async {
+  final response = await http.get(Uri.parse(url+'cave/bouteilles/'+id.toString()));
 
   if (response.statusCode == 200) {
     final List<dynamic> bouteillesJson =

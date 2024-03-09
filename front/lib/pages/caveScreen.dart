@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../fetch/caves.dart';
 
@@ -7,13 +6,18 @@ import '../fetch/caves.dart';
 
 
 class Cave extends StatelessWidget {
-  const Cave({Key? key}) : super(key: key);
+  final int caveId;
+
+  const Cave({Key? key, required int caveid})
+      : caveId = caveid,
+        super(key: key);
+
 
 
 
   @override
   Widget build(BuildContext context) {
-    late Future<List<Bouteille>> futureBouteilles = fetchBouteilles();
+    late Future<List<Bouteille>> futureBouteilles = fetchBouteilles(caveId);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Fetch Data Example'),

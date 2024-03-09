@@ -7,7 +7,7 @@
   - commande dans le dossier `./back/`
 
 
-- Si **Erreur** :
+- Si **Erreur** du port `3306`:
   > ``` Creating mysql ... error```<br/> ``` ERROR: for mysql  Cannot start service mysql: driver failed programming external connectivity on endpoint mysql```
   > - Faire la commande suivante :
   >   - ```sudo service mysql stop ```

@@ -1,144 +1,84 @@
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'bluetooth_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'pages/bluetooth/bluetooth.dart';
+import 'package:google_fonts/google_fonts.dart';
+import './colors.dart';
 
-const d_pink = Color(0xFFFEEBEB); // Couleur principale maquette 
 
-void main() {
-  runApp(MainApp());
-}
+void main() { runApp(MyApp()); }
 
-class MainApp extends StatelessWidget {
-  MainApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title : "PolyWine",
-      home : HomePage(),
+    return ChangeNotifierProvider(
+      create: (context) => MyAppState(),
+      child: MaterialApp(
+        title: 'Namer App',
+        theme: ThemeData(
+          useMaterial3: true,
+          colorScheme: ColorScheme.fromSeed(seedColor: background_color),
+        ),
+        home: FirstRoute(),
+      ),
     );
   }
 }
 
-class HomePage extends StatelessWidget {
+class MyAppState extends ChangeNotifier {}
+
+class FirstRoute extends StatelessWidget {
+  const FirstRoute({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: MyAppBar(),
-      body: SingleChildScrollView(
+      appBar: AppBar(
+        title: const Text('Choisir une cave'),
+      ),
+      body: Center(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SearchSection(),
-            InfosSection(),
-            BouteilleSection(),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ElevatedButton(
+                  child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        Text(
+                          "Ajout Cave",
+                          style: TextStyle(color: font_black),
+                        ),
+                        SizedBox(height: 20),
+                        Icon(
+                          Icons.bluetooth,
+                          color: font_pink,
+                          size: 24.0,
+                          semanticLabel:
+                              'Text to announce in accessibility modes',
+                        ),
+                      ],
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SecondRoute(),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            )
           ],
         ),
       ),
-    );
-  }
-}
-
-class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
-  Size get preferredSize => new Size.fromHeight(50);
-  @override 
-  Widget build(BuildContext context) {
-    return AppBar(
-      leading: const IconButton(
-        icon: Icon(
-          Icons.arrow_back,
-          color: Colors.black,
-          size: 24,
-        ),
-        onPressed: null,
-      ),
-      title: Text(
-          'Home page',
-          style: GoogleFonts.lato(
-            color: Colors.black,
-            fontSize: 24,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      actions: [
-              IconButton(
-        icon: const Icon(
-          Icons.bluetooth,
-          color: Colors.black,
-          size: 24,
-        ),
-        onPressed: () {
-          Navigator.push(
-            context, 
-            MaterialPageRoute(builder: (context) => BluetoothScreen()),
-          );
-        },
-      ),
-        const IconButton(
-        icon: Icon(
-          Icons.home,
-          color: Colors.black,
-          size: 24,
-        ),
-        onPressed: null,
-      ),
-      ],
-      centerTitle: true,
-      backgroundColor: Colors.white,
-    );
-  }
-}
-
-class SearchSection extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.red[50],
-      padding: const EdgeInsets.fromLTRB(10, 20, 10, 20),
-      child: Column(
-        children: [
-          Container(
-            height: 50,
-            color: Colors.blue,
-          ),
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  height: 50,
-                  color: Colors.green[300],
-                  // child: const TextField(),
-                )
-              ),
-              Container(
-                height: 50,
-                width: 60,
-                color: Colors.green,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class InfosSection extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 125,
-      color: Colors.red[100],
-    );
-  }
-}
-
-class BouteilleSection extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 1500,
-      color: Colors.red[200],
     );
   }
 }

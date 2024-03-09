@@ -10,7 +10,9 @@ dependencies:
   flutter:
     sdk: flutter
   google_fonts: ^6.1.0
-  flutter_blue: ^0.8.0
+  hexcolor: ^3.0.1
+  http: ^1.2.1
+  provider: ^6.1.2
   get: ^4.6.5
   permission_handler: ^11.3.0
 

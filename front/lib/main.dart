@@ -1,8 +1,8 @@
-import 'bluetooth_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'pages/bluetooth/bluetooth.dart';
-import 'package:google_fonts/google_fonts.dart';
+import './fetch/caves.dart';
+import 'pages/cave.dart';
 import './colors.dart';
 
 
@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(seedColor: background_color),
         ),
-        home: FirstRoute(),
+        home: Cave(),
       ),
     );
   }

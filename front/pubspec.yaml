@@ -9,12 +9,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
   google_fonts: ^6.1.0
   hexcolor: ^3.0.1
   http: ^1.2.1
   provider: ^6.1.2
-  get: ^4.6.5
-  permission_handler: ^11.3.0
 
 dev_dependencies:
   flutter_test:

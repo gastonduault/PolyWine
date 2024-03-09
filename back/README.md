@@ -3,10 +3,17 @@
 - installer *docker-compose*
 
 
-- **start servers** : `docker-compose up`
+- **start servers** : `sudo docker-compose up`
   - commande dans le dossier `./back/`
-  - il faut faire la commande en root
 
+
+- Si **Erreur** :
+  > ``` Creating mysql ... error```<br/> ``` ERROR: for mysql  Cannot start service mysql: driver failed programming external connectivity on endpoint mysql```
+  > - Faire la commande suivante :
+  >   - ```sudo service mysql stop ```
+  > - Puis éteindre et rallumer les services :
+  >   - ```sudo docker-compose down ```
+  >   - ```sudo docker-compose up ```
 
 
 ## Test des endpoints :

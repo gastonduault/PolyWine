@@ -88,7 +88,7 @@ def get_bouteilles_by_cave(caveid):
             'date_ajout': bouteille.date_ajout.strftime('%Y-%m-%d'),
             'caveId': bouteille.caveId
         })
-    return jsonify({'bouteilles': bouteilles_list})
+    return jsonify({'bouteilles': bouteilles_list}), {'Content-Type': 'application/json; charset=utf-8'}
 
 
 #ajout d'une bouteille

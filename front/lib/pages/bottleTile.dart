@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import '../fetch/bouteille.dart';
 import '../assets/colors.dart';
 import './home.dart';
@@ -32,7 +33,7 @@ class BouteilleTile extends StatelessWidget {
         ),
         padding: MaterialStateProperty.all(const EdgeInsets.all(15)),
         minimumSize:MaterialStateProperty.all(Size(100, 100)),
-        maximumSize:MaterialStateProperty.all(Size(150, 300)),
+        maximumSize:MaterialStateProperty.all(Size(150, 200)),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -63,24 +64,23 @@ class BouteilleTile extends StatelessWidget {
             mainAxisSize: MainAxisSize.max,
             children: [
               Expanded(
-                child: Text( 
-                  bouteille.nom,    
-                  style: TextStyle(
-                    color: font_black,
-                    fontWeight: FontWeight.w600,
-                  )
-                )
-              ),
+                  child: Text(bouteille.nom,
+                      style: TextStyle(
+                        fontFamily: 'RobotoRegular',
+                        color: font_black,
+                        fontWeight: FontWeight.w600,
+                      ))),
+            ],
+          ),
+            Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.max,
+            children: [
               Expanded(
                   child: Text(bouteille.Region,
-                  style: TextStyle(
-                    color: font_black,
-                    fontSize: 13
-                  )
-                )
-              ),
+                      style: TextStyle(color: font_black, fontSize: 13))),
             ],
-          )
+          ),
         ],
       ),
     );

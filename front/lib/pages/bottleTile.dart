@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import '../fetch/bouteille.dart';
@@ -6,11 +7,9 @@ import './home.dart';
 
 
 class BouteilleTile extends StatelessWidget {
-
   final Bouteille bouteille;
 
-  const BouteilleTile({Key? key, required this.bouteille}) 
-  : super(key: key);
+  const BouteilleTile({Key? key, required this.bouteille}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -31,9 +30,9 @@ class BouteilleTile extends StatelessWidget {
             side: BorderSide(color: font_pink),
           ),
         ),
-        padding: MaterialStateProperty.all(const EdgeInsets.all(15)),
-        minimumSize:MaterialStateProperty.all(Size(100, 100)),
-        maximumSize:MaterialStateProperty.all(Size(150, 200)),
+        padding: MaterialStateProperty.all(const EdgeInsets.all(10)),
+        minimumSize: MaterialStateProperty.all(Size(100, 100)),
+        maximumSize: MaterialStateProperty.all(Size(150, 200)),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -59,27 +58,25 @@ class BouteilleTile extends StatelessWidget {
               ),
             ],
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Expanded(
-                  child: Text(bouteille.nom,
-                      style: TextStyle(
-                        fontFamily: 'RobotoRegular',
-                        color: font_black,
-                        fontWeight: FontWeight.w600,
-                      ))),
-            ],
-          ),
-            Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Expanded(
-                  child: Text(bouteille.Region,
-                      style: TextStyle(color: font_black, fontSize: 13))),
-            ],
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  bouteille.nom,
+                  style: TextStyle(
+                    fontFamily: 'RobotoRegular',
+                    color: font_black,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  bouteille.Region,
+                  style: TextStyle(color: font_black, fontSize: 13),
+                ),
+              ],
+            ),
           ),
         ],
       ),

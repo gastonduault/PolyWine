@@ -1,11 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'bottleTile.dart';
 import '../fetch/bouteille.dart';
+import '../assets/colors.dart';
 import '../fetch/cave.dart';
-
-
-
+import './addBottle.dart';
+import 'bottleTile.dart';
 
 class caveScreen extends StatelessWidget {
   final int caveId;
@@ -17,7 +16,7 @@ class caveScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
+    
     late Future<List<Bouteille>> futureBouteilles = fetchBouteilles(caveId);
     late Future<Cave> futureCave = fetchCave(caveId);
 
@@ -43,19 +42,71 @@ class caveScreen extends StatelessWidget {
               future: futureBouteilles,
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  return GridView.builder(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 20.0,
-                      mainAxisSpacing: 20.0,
-                      childAspectRatio: 0.5,
-                    ),
-                    itemCount: snapshot.data!.length,
-                    itemBuilder: (context, index) {
-                      return BouteilleTile(bouteille: snapshot.data![index]);
-                    },
+                  return Column(
+                    children: [
+                      Text(
+                        ' ${6 - snapshot.data!.length} EMPLACEMENT VIDE',
+                        style: TextStyle(
+                            fontSize: 13,
+                            fontFamily: 'RobotoRegular',
+                            color: font_pink
+                          ),
+                      ),
+                      SizedBox(height: 10,),
+                      ElevatedButton(
+                        style: ButtonStyle(
+                          padding: MaterialStateProperty.all(
+                            const EdgeInsets.all(0)
+                          ),
+                          backgroundColor:
+                              MaterialStateProperty.all(background_color),
+                          shape:
+                            MaterialStateProperty.all<CircleBorder>(
+                              CircleBorder(),
+                            ),
+                        ),
+                        child:  Image.asset(
+                          "lib/assets/img/ajouter.png",
+                          width: 16,
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AjoutBouteille(caveid: caveId,),
+                            ),
+                          );
+                        },
+                      ),
+                      SizedBox(height: 5,),
+                      GridView.builder(
+                        shrinkWrap: true,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 20.0,
+                          mainAxisSpacing: 20.0,
+                          childAspectRatio: 0.5,
+                        ),
+                        itemCount: snapshot.data!.length,
+                        itemBuilder: (context, index) {
+                          return BouteilleTile(
+                              bouteille: snapshot.data![index]);
+                        },
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text(
+                        ' ${snapshot.data!.length} / 6 BOUTEILLES',
+                        style: TextStyle(
+                            fontSize: 13,
+                            fontFamily: 'RobotoRegular',
+                            color: font_pink),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                    ],
                   );
                 } else if (snapshot.hasError) {
                   return Text('${snapshot.error}');
@@ -69,31 +120,3 @@ class caveScreen extends StatelessWidget {
     );
   }
 }
-
-
-
-// shrinkWrap: true,
-// children: [
-//   Row(
-//     mainAxisAlignment: MainAxisAlignment.center,
-//     mainAxisSize: MainAxisSize.max,
-//     children: [
-//       BouteilleTile(bouteille: snapshot.data![0]),
-//       SizedBox(width: 20,),
-//       BouteilleTile(bouteille: snapshot.data![1])
-//     ],
-//   ),
-//   SizedBox(height: 20,),
-//   Row(
-//     mainAxisAlignment: MainAxisAlignment.center,
-//     mainAxisSize: MainAxisSize.max,
-//     children: [
-//       BouteilleTile(bouteille: snapshot.data![2]),
-//       SizedBox(
-//         width: 20,
-//       ),
-//       BouteilleTile(bouteille: snapshot.data![3])
-//     ],
-//   ),
-//   SizedBox(height: 20,),
-// ],

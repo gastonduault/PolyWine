@@ -17,8 +17,10 @@
 
 
 ## Test des endpoints :
-> - Liste des bouteilles d'une cave (à partir de son id)<br/>
+> - Info d'une cave <br/>
 ``` curl http://localhost:5000/cave/1```
+> - Liste des bouteilles d'une cave (à partir de son id)<br/>
+``` curl http://localhost:5000/cave/bouteilles/1```
 > - Modifier le nom d'une cave<br/> 
 ``` curl -X PUT -H "Content-Type: application/json" -d '{"nom": "NouveauNomDeCave"}' http://localhost:5000/caves/1```
 > - Modifier une bouteille <br/>

@@ -6,6 +6,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://user:user@mysql/polywine'
 db = SQLAlchemy(app)
 
 
+
 class Bouteille(db.Model):
     __tablename__ = 'bouteilles'
     id = db.Column(db.Integer, primary_key=True)
@@ -23,6 +24,8 @@ class Cave(db.Model):
     nom = db.Column(db.String(50), nullable=False)
 
 
+
+#création cave
 @app.route('/caves', methods=['POST'])
 def add_cave():
     if request.method == 'POST':
@@ -39,6 +42,18 @@ def add_cave():
             db.session.close()
 
 
+#info cave
+@app.route('/cave/<int:cave_id>', methods=['GET'])
+def get_cave_name(cave_id):
+    cave = Cave.query.get(cave_id)
+
+    if cave:
+        return jsonify({'cave_id': cave.id, 'cave_nom': cave.nom})
+    else:
+        return jsonify({'message': 'Cave non trouvée'}), 404
+
+
+#modifier cave
 @app.route('/caves/<int:cave_id>', methods=['POST'])
 def update_cave(cave_id):
     cave = Cave.query.get(cave_id)
@@ -58,6 +73,7 @@ def update_cave(cave_id):
         return jsonify({'message': 'Cave non trouvée'}), 404
 
 
+#lister les bouteilles d'une cave
 @app.route('/cave/bouteilles/<int:caveid>', methods=['GET'])
 def get_bouteilles_by_cave(caveid):
     bouteilles = Bouteille.query.filter_by(caveId=caveid).all()
@@ -75,6 +91,7 @@ def get_bouteilles_by_cave(caveid):
     return jsonify({'bouteilles': bouteilles_list})
 
 
+#ajout d'une bouteille
 @app.route('/bouteilles', methods=['POST'])
 def add_bouteille():
     if request.method == 'POST':
@@ -100,6 +117,7 @@ def add_bouteille():
             db.session.close()
 
 
+#modification d'une bouteille
 @app.route('/bouteilles/<int:bouteille_id>', methods=['POST'])
 def update_bouteille(bouteille_id):
     bouteille = Bouteille.query.get(bouteille_id)
@@ -127,6 +145,7 @@ def update_bouteille(bouteille_id):
         return jsonify({'message': 'Bouteille non trouvée'}), 404
 
 
+#suppression bouteille
 @app.route('/bouteille/<int:bouteille_id>', methods=['DELETE'])
 def delete_bouteille(bouteille_id):
     bouteille = Bouteille.query.get(bouteille_id)

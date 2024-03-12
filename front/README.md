@@ -16,3 +16,8 @@ Lien des maquettes
 
 *pour mettre à jour*
 >- git pull origin nom_de_la_branch
+
+
+*pour mettre à jour*
+>- git pull origin nom_de_la_branch
+

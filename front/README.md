@@ -6,7 +6,10 @@ Lien des maquettes
 
 
 ### git commandes
+*Cloner le repository* 
 > - git clone git@github.com:gastonduault/PolyWine.git
+
+*Voir l'état du dépôt local (voir si on a fait des modifications) :* 
 > - git status 
 
 *pour push ses modifications :* 
@@ -17,7 +20,11 @@ Lien des maquettes
 *pour mettre à jour*
 >- git pull origin nom_de_la_branch
 
+*Voir sur quel branch on est*
+>- git branch
 
-*pour mettre à jour*
->- git pull origin nom_de_la_branch
+*Changer de branch*
+>- git checkout nom_de_la_branch
 
+*Créer une branche (qui sera une copie de la branche sur laquelle on est*
+>- git checkout -b nom_nouvelle_branch

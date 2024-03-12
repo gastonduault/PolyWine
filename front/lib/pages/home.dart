@@ -46,7 +46,7 @@ class Home extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const SecondRoute(),
+                      builder: (context) => const ScanPage(),
                     ),
                   );
                 },

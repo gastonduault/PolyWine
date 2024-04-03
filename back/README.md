@@ -28,8 +28,15 @@
 > - Modifier le nom d'une cave<br/> 
 ``` curl -X PUT -H "Content-Type: application/json" -d '{"nom": "NouveauNomDeCave"}' http://localhost:5001/caves/1```
 > - Modifier une bouteille <br/>
-``` curl -X PUT -H "Content-Type: application/json" -d '{"nom": "NouveauNom", "cuvee": "NouvelleCuvee", "region": "NouvelleRegion", "categorie": "NouvelleCategorie", "date_recolte": "NouvelleDateRecolte", "date_ajout": "NouvelleDateAjout", "caveId": 2}' http://localhost:5001/bouteilles/1```
+``` curl -X PUT -H "Content-Type: application/json" -d '{"nom": "NouveauNom", "cuvee": "NouvelleCuvee", "region": "NouvelleRegion", "categorie": "NouvelleCategorie", "date_recolte": "NouvelleDateRecolte", "caveId": 2}' http://localhost:5001/bouteilles/1```
 > - Supprimer une bouteille<br/>
 ``` curl -X DELETE http://localhost:5001/bouteilles/1 ```
 > - Ajouter une bouteille<br />
-``` curl -X POST -H "Content-Type: application/json" -d '{"nom": "Vouvray", "cuvee": "Domaine d\'Orsay", "region": "Bordeaux", "categorie": "rouge", "date_recolte": "2020", "date_ajout": "2023-12-15", "caveId": 1}' http://localhost:5001/bouteilles```
+``` curl -X POST -H "Content-Type: application/json" -d '{
+    "nom": "Nom de la bouteille",
+    "cuvee": "Cuvee de la bouteille",
+    "region": "Region de la bouteille",
+    "categorie": "Categorie de la bouteille",
+    "date_recolte": 2022,
+    "caveId": 1
+} ```

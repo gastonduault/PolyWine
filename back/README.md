@@ -32,11 +32,4 @@
 > - Supprimer une bouteille<br/>
 ``` curl -X DELETE http://localhost:5001/bouteilles/1 ```
 > - Ajouter une bouteille<br />
-``` curl -X POST -H "Content-Type: application/json" -d '{
-    "nom": "Nom de la bouteille",
-    "cuvee": "Cuvee de la bouteille",
-    "region": "Region de la bouteille",
-    "categorie": "Categorie de la bouteille",
-    "date_recolte": 2022,
-    "caveId": 1
-} ```
+``` curl -X POST -H "Content-Type: application/json" -d '{"nom": "Nom de la bouteille", "cuvee": "Cuvee de la bouteille", "region": "Region de la bouteille", "categorie": "Categorie de la bouteille", "date_recolte": 2022, "caveId": 1 } ```

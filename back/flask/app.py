@@ -14,7 +14,7 @@ class Bouteille(db.Model):
     cuvee = db.Column(db.String(50), nullable=False)
     region = db.Column(db.String(50), nullable=False)
     categorie = db.Column(db.String(50), nullable=False)
-    date_recolte = db.Column(db.String(50), nullable=False)
+    date_recolte = db.Column(db.Integer, nullable=False)
     caveId = db.Column(db.Integer, db.ForeignKey('caves.id'), nullable=False)
 
 class Cave(db.Model):
@@ -106,7 +106,7 @@ def add_bouteille():
         try:
             db.session.add(new_bouteille)
             db.session.commit()
-            return jsonify({'message': 'Bouteille ajoutée avec succès!'}), 201
+            return jsonify({'message': 'Bouteille ajoutée avec succès!'}), 200
         except:
             db.session.rollback()
             return jsonify({'message': 'Erreur lors de l\'ajout de la bouteille'}), 500

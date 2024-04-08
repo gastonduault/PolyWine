@@ -20,6 +20,7 @@ class Bouteille {
     required this.Region,
   });
 
+
   factory Bouteille.fromJson(Map<String, dynamic> json) {
     return Bouteille(
       categorie: json['categorie'] ?? '',
@@ -31,6 +32,7 @@ class Bouteille {
     );
   }
 }
+
 
 
 Future<List<Bouteille>> fetchBouteilles(int id) async {
@@ -64,8 +66,9 @@ Future<void> ajouterBouteille(Bouteille nouvelleBouteille) async {
   );
 
   if (response.statusCode == 200) {
-    print('Bouteille ajoutée avec succès');
+    print(response.body);
   } else {
-    throw Exception('Failed to add bouteille');
+    throw Exception('Failed to add bottle');
   }
+
 }

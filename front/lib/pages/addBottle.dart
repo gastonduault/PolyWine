@@ -204,13 +204,12 @@ class _AjoutBouteilleState extends State<AjoutBouteille> {
   void clickAjoutBouteille() {
 
     Bouteille nouvelleBouteille = Bouteille(
-      //TODO: à changer la categorie
-      categorie: 'votre_categorie', // Remplacez par la catégorie appropriée
-      caveId: widget.caveId,
-      cuvee: _cuveeBouteilleController.text,
-      dateRecolt: _selectedDate.millisecondsSinceEpoch,
       nom: _nomBouteilleController.text,
+      cuvee: _cuveeBouteilleController.text,
       Region: _regionController.text,
+      categorie: 'rouge',
+      dateRecolt: _selectedDate.year,
+      caveId: widget.caveId,
     );
 
     ajouterBouteille(nouvelleBouteille);

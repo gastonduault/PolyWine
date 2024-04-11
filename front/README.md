@@ -1,4 +1,4 @@
-## Maquettes
+## Maquettes (figma)
 
 <a href="https://www.figma.com/proto/3vyjWRazGmI9xCGPG7ij4v?node-id=0-1&t=0FpNm5Ffpij5tY2E-6"> 
 Lien des maquettes 

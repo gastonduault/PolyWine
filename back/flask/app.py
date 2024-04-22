@@ -14,8 +14,7 @@ class Bouteille(db.Model):
     cuvee = db.Column(db.String(50), nullable=False)
     region = db.Column(db.String(50), nullable=False)
     categorie = db.Column(db.String(50), nullable=False)
-    date_recolte = db.Column(db.String(50), nullable=False)
-    date_ajout = db.Column(db.Date, nullable=False)
+    date_recolte = db.Column(db.Integer, nullable=False)
     caveId = db.Column(db.Integer, db.ForeignKey('caves.id'), nullable=False)
 
 class Cave(db.Model):
@@ -85,7 +84,6 @@ def get_bouteilles_by_cave(caveid):
             'region': bouteille.region,
             'categorie': bouteille.categorie,
             'date_recolte': bouteille.date_recolte,
-            'date_ajout': bouteille.date_ajout.strftime('%Y-%m-%d'),
             'caveId': bouteille.caveId
         })
     return jsonify({'bouteilles': bouteilles_list}), {'Content-Type': 'application/json; charset=utf-8'}
@@ -103,13 +101,12 @@ def add_bouteille():
             region=data['region'],
             categorie=data['categorie'],
             date_recolte=data['date_recolte'],
-            date_ajout=data['date_ajout'],
             caveId=data['caveId']
         )
         try:
             db.session.add(new_bouteille)
             db.session.commit()
-            return jsonify({'message': 'Bouteille ajoutée avec succès!'}), 201
+            return jsonify({'message': 'Bouteille ajoutée avec succès!'}), 200
         except:
             db.session.rollback()
             return jsonify({'message': 'Erreur lors de l\'ajout de la bouteille'}), 500
@@ -131,7 +128,6 @@ def update_bouteille(bouteille_id):
             bouteille.region = data['region']
             bouteille.categorie = data['categorie']
             bouteille.date_recolte = data['date_recolte']
-            bouteille.date_ajout = data['date_ajout']
             bouteille.caveId = data['caveId']
 
             db.session.commit()

@@ -16,7 +16,7 @@ class caveScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
+
     late Future<List<Bouteille>> futureBouteilles = fetchBouteilles(caveId);
     late Future<Cave> futureCave = fetchCave(caveId);
 
@@ -26,7 +26,38 @@ class caveScreen extends StatelessWidget {
           future: futureCave,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              return Text(snapshot.data!.nom);
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      snapshot.data!.nom,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  FutureBuilder<List<Bouteille>>(
+                    future: futureBouteilles,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return Text(
+                          '${6 - snapshot.data!.length} places',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontFamily: 'RobotoRegular',
+                            color: font_pink,
+                          ),
+                        );
+                      } else if (snapshot.hasError) {
+                        return Text('Erreur: ${snapshot.error}');
+                      }
+                      return Text('Chargement...');
+                    },
+                  ),
+                ],
+              );
             } else if (snapshot.hasError) {
               return Text('Erreur: ${snapshot.error}');
             }
@@ -42,71 +73,57 @@ class caveScreen extends StatelessWidget {
               future: futureBouteilles,
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  return Column(
-                    children: [
-                      Text(
-                        ' ${6 - snapshot.data!.length} EMPLACEMENT VIDE',
-                        style: TextStyle(
-                            fontSize: 13,
-                            fontFamily: 'RobotoRegular',
-                            color: font_pink
-                          ),
-                      ),
-                      SizedBox(height: 10,),
-                      ElevatedButton(
-                        style: ButtonStyle(
-                          padding: MaterialStateProperty.all(
-                            const EdgeInsets.all(0)
-                          ),
-                          backgroundColor:
-                              MaterialStateProperty.all(background_color),
-                          shape:
-                            MaterialStateProperty.all<CircleBorder>(
+                  return SizedBox(
+                    height: MediaQuery.of(context)
+                        .size
+                        .height,
+                    child: Column(
+                      children: [
+                        ElevatedButton(
+                          style: ButtonStyle(
+                            padding: MaterialStateProperty.all(
+                                const EdgeInsets.all(0)),
+                            backgroundColor:
+                                MaterialStateProperty.all(background_color),
+                            shape: MaterialStateProperty.all<CircleBorder>(
                               CircleBorder(),
                             ),
+                          ),
+                          child: Image.asset(
+                            "lib/assets/img/ajouter.png",
+                            width: 16,
+                          ),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AjoutBouteille(
+                                  caveid: caveId,
+                                ),
+                              ),
+                            );
+                          },
                         ),
-                        child:  Image.asset(
-                          "lib/assets/img/ajouter.png",
-                          width: 16,
-                        ),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => AjoutBouteille(caveid: caveId,),
+                        Expanded(
+                          child: GridView.builder(
+                            shrinkWrap: true,
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 20.0,
+                              mainAxisSpacing: 20.0,
+                              childAspectRatio: 0.5,
                             ),
-                          );
-                        },
-                      ),
-                      SizedBox(height: 5,),
-                      GridView.builder(
-                        shrinkWrap: true,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 20.0,
-                          mainAxisSpacing: 20.0,
-                          childAspectRatio: 0.5,
+                            itemCount: snapshot.data!.length,
+                            itemBuilder: (context, index) {
+                              return BouteilleTile(
+                                  bouteille: snapshot.data![index]);
+                            },
+                          ),
                         ),
-                        itemCount: snapshot.data!.length,
-                        itemBuilder: (context, index) {
-                          return BouteilleTile(
-                              bouteille: snapshot.data![index]);
-                        },
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Text(
-                        ' ${snapshot.data!.length} / 6 BOUTEILLES',
-                        style: TextStyle(
-                            fontSize: 13,
-                            fontFamily: 'RobotoRegular',
-                            color: font_pink),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                    ],
+                        SizedBox(height: 100,)
+                      ],
+                    ),
                   );
                 } else if (snapshot.hasError) {
                   return Text('${snapshot.error}');

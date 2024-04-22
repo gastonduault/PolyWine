@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import './bluetooth/bluetooth.dart';
 import '../assets/colors.dart';
 import 'listeBottle.dart';
+import 'package:provider/provider.dart';
+import './bluetooth/bluetooth_manager.dart';
 
 
 class Home extends StatelessWidget {
@@ -16,6 +18,19 @@ class Home extends StatelessWidget {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
+          // Modifications pour ajouts du nombre de bouteilles présentes dans la cave à vin
+          Consumer<BluetoothManager>(
+            builder: (context, manager, child) {
+              return Column(
+                children: [
+                  Text("Il y a ${manager.nbBouteilles} bouteilles dans la cave à vin", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  Text("Les emplacements ${manager.occupiedLocations.join(", ")} de la cave à vin sont occupés"),
+                  if (manager.lastModifiedLocation != null)
+                    Text("L'emplacement ${manager.lastModifiedLocation} a été le dernier modifié"),
+                ],
+              );
+            },
+          ),
           Row(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.center,

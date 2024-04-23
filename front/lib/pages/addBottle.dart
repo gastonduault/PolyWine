@@ -1,7 +1,6 @@
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
-import '../pages/listeBottle.dart';
-import '../fetch/bouteille.dart';
+import '../pages/caseBottle.dart';
 import '../assets/colors.dart';
 import '../main.dart';
 
@@ -36,9 +35,6 @@ class _AjoutBouteilleState extends State<AjoutBouteille> {
 
   @override
   Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
-    var caveId = appState.caveID;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text("Ajout d'une bouteille"),
@@ -94,7 +90,7 @@ class _AjoutBouteilleState extends State<AjoutBouteille> {
                   _selectedRegion = newValue;
                 });
               },
-              items: <String>['Rouge', 'Blanc']
+              items: <String>['rouge', 'blanc']
                   .map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
@@ -207,44 +203,19 @@ class _AjoutBouteilleState extends State<AjoutBouteille> {
     var appState = context.read<MyAppState>();
     var caveId = appState.caveID;
 
-    Bouteille nouvelleBouteille = Bouteille(
-      nom: _nomBouteilleController.text,
-      cuvee: _cuveeBouteilleController.text,
-      Region: _regionController.text,
-      categorie: 'rouge',
-      dateRecolt: _selectedDate.year,
-      caveId: caveId,
+    appState.bouteilleEnAjout.nom = _nomBouteilleController.text;
+    appState.bouteilleEnAjout.cuvee = _cuveeBouteilleController.text;
+    appState.bouteilleEnAjout.Region = _regionController.text;
+    appState.bouteilleEnAjout.categorie = _selectedRegion ?? "rouge";
+    appState.bouteilleEnAjout.dateRecolt = _selectedDate.year;
+    appState.bouteilleEnAjout.caveId = caveId;
+    appState.bouteilleEnAjout.emplacement = 0;
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => caseBottle(),
+      ),
     );
-
-    bool ajout = await fetchAjouterBouteille(nouvelleBouteille);
-
-    if (ajout) {
-      print("bouteille ajoutée");
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => caveScreen(),
-        ),
-      );
-    } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            content: Text('Échec de l\'ajout de la bouteille.'),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Center(
-                  child: Text('OK'),
-                ),
-              ),
-            ],
-          );
-        },
-      );
-    }
   }
 }

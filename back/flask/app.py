@@ -16,6 +16,7 @@ class Bouteille(db.Model):
     categorie = db.Column(db.String(50), nullable=False)
     date_recolte = db.Column(db.Integer, nullable=False)
     caveId = db.Column(db.Integer, db.ForeignKey('caves.id'), nullable=False)
+    emplacement = db.Column(db.Integer, nullable=False)
 
 class Cave(db.Model):
     __tablename__ = 'caves'
@@ -84,7 +85,8 @@ def get_bouteilles_by_cave(caveid):
             'region': bouteille.region,
             'categorie': bouteille.categorie,
             'date_recolte': bouteille.date_recolte,
-            'caveId': bouteille.caveId
+            'caveId': bouteille.caveId,
+            'emplacement': bouteille.emplacement
         })
     return jsonify({'bouteilles': bouteilles_list}), {'Content-Type': 'application/json; charset=utf-8'}
 
@@ -101,7 +103,8 @@ def add_bouteille():
             region=data['region'],
             categorie=data['categorie'],
             date_recolte=data['date_recolte'],
-            caveId=data['caveId']
+            caveId=data['caveId'],
+            emplacement=data['emplacement']
         )
         try:
             db.session.add(new_bouteille)
@@ -129,6 +132,7 @@ def update_bouteille(bouteille_id):
             bouteille.categorie = data['categorie']
             bouteille.date_recolte = data['date_recolte']
             bouteille.caveId = data['caveId']
+            bouteille.emplacement = data["emplacement"]
 
             db.session.commit()
             return jsonify({'message': 'Bouteille mise à jour avec succès!'}), 200

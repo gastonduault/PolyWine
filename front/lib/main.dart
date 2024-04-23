@@ -1,3 +1,5 @@
+import 'package:project_app/fetch/bouteille.dart';
+
 import 'pages/bluetooth/bluetooth_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
@@ -32,6 +34,15 @@ class MyApp extends StatelessWidget {
 
 class MyAppState extends ChangeNotifier {
   var caveID = null;
-
   var bouteilleID = null;
+  Bouteille bouteilleEnAjout = Bouteille(
+      nom: "",
+      cuvee: "",
+      Region: "",
+      categorie: '',
+      dateRecolt: -1,
+      caveId: -1,
+      emplacement: -1);
+
+  bool bluetoothConnected = false;
 }

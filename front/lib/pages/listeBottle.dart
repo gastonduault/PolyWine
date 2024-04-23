@@ -72,6 +72,7 @@ class caveScreen extends StatelessWidget {
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return SizedBox(
+                    // Couleur de la ligne
                     height: MediaQuery.of(context).size.height,
                     child: Column(
                       children: [

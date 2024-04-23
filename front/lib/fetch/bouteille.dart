@@ -3,21 +3,22 @@ import 'package:http/http.dart' as http;
 import 'url.dart';
 
 class Bouteille {
-  final String categorie;
-  final int caveId;
-  final String cuvee;
-  final int dateRecolt;
-  final String nom;
-  final String Region;
+  String categorie;
+  int caveId;
+  String cuvee;
+  int dateRecolt;
+  String nom;
+  String Region;
+  int emplacement;
 
-  Bouteille({
-    required this.categorie,
-    required this.caveId,
-    required this.cuvee,
-    required this.dateRecolt,
-    required this.nom,
-    required this.Region,
-  });
+  Bouteille(
+      {required this.categorie,
+      required this.caveId,
+      required this.cuvee,
+      required this.dateRecolt,
+      required this.nom,
+      required this.Region,
+      required this.emplacement});
 
   factory Bouteille.fromJson(Map<String, dynamic> json) {
     return Bouteille(
@@ -27,6 +28,7 @@ class Bouteille {
       dateRecolt: json['date_recolte'] ?? '',
       nom: json['nom'] ?? '',
       Region: json['region'] ?? '',
+      emplacement: json['emplacement'] ?? 0,
     );
   }
 }
@@ -38,6 +40,7 @@ Future<List<Bouteille>> fetchBouteilles(int id) async {
   if (response.statusCode == 200) {
     final List<dynamic> bouteillesJson =
         jsonDecode(response.body)['bouteilles'];
+    print(response.body);
     return bouteillesJson.map((json) => Bouteille.fromJson(json)).toList();
   } else {
     throw Exception('Failed to load bouteilles');
@@ -57,6 +60,7 @@ Future<bool> fetchAjouterBouteille(Bouteille nouvelleBouteille) async {
       'categorie': nouvelleBouteille.categorie,
       'date_recolte': nouvelleBouteille.dateRecolt,
       'caveId': nouvelleBouteille.caveId,
+      'emplacement': nouvelleBouteille.emplacement,
     }),
   );
 

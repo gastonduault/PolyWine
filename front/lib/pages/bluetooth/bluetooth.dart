@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:provider/provider.dart';
 import 'bluetooth_manager.dart';
+import '../home.dart';
 
 class ScanPage extends StatefulWidget {
   const ScanPage({Key? key}) : super(key: key);
@@ -102,21 +103,21 @@ class DeviceDetailPage extends StatefulWidget {
 class _DeviceDetailPageState extends State<DeviceDetailPage> {
   bool isConnected = false;
   List<BluetoothService> services = [];
-  String receivedData = ""; // Pour stocker les données reçues
-  TextEditingController commandController = TextEditingController();
-  List<String> terminalLogs = []; // Historique des messages
+  String receivedData = "";
+  List<String> logs = []; // Ajout d'une liste pour stocker les logs
 
-  final Guid serviceUuid = Guid("0000ffe0-0000-1000-8000-00805f9b34fb"); // Ajusté
-  final Guid characteristicUuid = Guid("0000ffe1-0000-1000-8000-00805f9b34fb"); // Ajusté
+  final Guid serviceUuid = Guid("0000ffe0-0000-1000-8000-00805f9b34fb");
+  final Guid characteristicUuid = Guid("0000ffe1-0000-1000-8000-00805f9b34fb");
   BluetoothCharacteristic? characteristic;
 
   @override
   void initState() {
     super.initState();
-    // connectAndDiscoverServices();
+    connectAndDiscoverServices();
   }
 
   void connectAndDiscoverServices() async {
+    if (widget.device == null) return;
     await widget.device.connect();
     services = await widget.device.discoverServices();
     for (var service in services) {
@@ -126,92 +127,94 @@ class _DeviceDetailPageState extends State<DeviceDetailPage> {
             characteristic = char;
             await char.setNotifyValue(true);
             char.value.listen((value) {
-              setState(() {
-                String receivedMessage = utf8.decode(value);
-                terminalLogs.add("Reçu : $receivedMessage");
-                receivedData = receivedMessage; // Stocke les données reçues
-              });
+              String receivedMessage = utf8.decode(value);
+              if (mounted) {              
+                setState(() {
+                  logs.add("Reçu : $receivedMessage");
+                  receivedData = receivedMessage;
+                });
+              }
             });
             break;
           }
         }
       }
     }
-    setState(() {
-      isConnected = true;
-    });
+    if (mounted) {
+      setState(() {
+        isConnected = true;
+      });
+    }
     widget.onDeviceConnected();
   }
 
-void sendMessage(String message) async {
-  if (characteristic == null) {
-    print("Caractéristique non disponible.");
-    return;
+  void sendMessage(String message) async {
+    if (characteristic == null) {
+      logs.add("Caractéristique non disponible.");
+      return;
+    }
+    try {
+      await characteristic!.write(utf8.encode(message), withoutResponse: true);
+      setState(() {
+        logs.add("Envoyé : $message");
+      });
+    } catch (e) {
+      logs.add("Erreur lors de l'envoi du message : $e");
+    }
   }
-  try {
-    await characteristic!.write(utf8.encode(message), withoutResponse: true);
-    setState(() {
-      terminalLogs.add("Envoyé : $message");
-    });
-  } catch (e) {
-    print("Erreur lors de l'envoi du message : $e");
-    // Affichage facultatif d'un message d'erreur à l'utilisateur
-  }
-}
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.device.name ?? "Unknown Device"),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => Home()));
+          },
+        ),
       ),
-      body: Consumer<BluetoothManager>(
-        builder: (context, manager, child) {
-          return Column(
-            children: [
-              Expanded(
-                child: ListView.builder(
-                  itemCount: manager.messages.length,
-                  itemBuilder: (context, index) => ListTile(
-                    title: Text(manager.messages[index]),
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              itemCount: logs.length,
+              itemBuilder: (context, index) => ListTile(
+                title: Text(logs[index]),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: TextEditingController(),
+                    decoration: InputDecoration(
+                      hintText: "Type your message here",
+                      border: OutlineInputBorder(),
+                    ),
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        decoration: InputDecoration(
-                          hintText: "Tapez votre message ici",
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
-                    ),
-                    IconButton( 
-                      icon: Icon(Icons.send),
-                      onPressed: () {
-                        manager.sendMessage("Hello DSD Tech");
-                      },
-                    ),
-                  ],
+                IconButton(
+                  icon: Icon(Icons.send),
+                  onPressed: () => sendMessage("OK"), // Envoie 'OK' pour initier la communication
                 ),
-              ),
-            ],
-          );
-        },
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 
   @override
   void dispose() {
-    // if (isConnected) {
-    //   widget.device.disconnect();
-    // }
-    // FlutterBluePlus.stopScan();
+    if (characteristic != null) {
+    characteristic?.setNotifyValue(false);  // Désactiver les notifications
+    }
     super.dispose();
   }
 }

@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'url.dart';
 
 class Bouteille {
+  int? id; // Rendre l'attribut id nullable
   String categorie;
   int caveId;
   String cuvee;
@@ -11,21 +12,24 @@ class Bouteille {
   String Region;
   int emplacement;
 
-  Bouteille(
-      {required this.categorie,
-      required this.caveId,
-      required this.cuvee,
-      required this.dateRecolt,
-      required this.nom,
-      required this.Region,
-      required this.emplacement});
+  Bouteille({
+    this.id,
+    required this.categorie,
+    required this.caveId,
+    required this.cuvee,
+    required this.dateRecolt,
+    required this.nom,
+    required this.Region,
+    required this.emplacement,
+  });
 
   factory Bouteille.fromJson(Map<String, dynamic> json) {
     return Bouteille(
+      id: json['id'],
       categorie: json['categorie'] ?? '',
       caveId: json['caveId'] ?? 0,
       cuvee: json['cuvee'] ?? '',
-      dateRecolt: json['date_recolte'] ?? '',
+      dateRecolt: json['date_recolte'] ?? 0,
       nom: json['nom'] ?? '',
       Region: json['region'] ?? '',
       emplacement: json['emplacement'] ?? 0,
@@ -34,8 +38,7 @@ class Bouteille {
 }
 
 Future<List<Bouteille>> fetchBouteilles(int id) async {
-  final response =
-      await http.get(Uri.parse(url + 'cave/bouteilles/' + id.toString()));
+  final response = await http.get(Uri.parse(url + 'cave/bouteilles/$id'));
 
   if (response.statusCode == 200) {
     final List<dynamic> bouteillesJson =
@@ -68,6 +71,31 @@ Future<bool> fetchAjouterBouteille(Bouteille nouvelleBouteille) async {
     return true;
   } else {
     // throw Exception('Failed to add bottle');
+    return false;
+  }
+}
+
+Future<bool> fetchModifierBouteille(Bouteille bouteilleModifiee) async {
+  final response = await http.post(
+    Uri.parse(url +
+        'bouteilles/${bouteilleModifiee.id}'), // Assurez-vous d'avoir un attribut id dans votre classe Bouteille
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+    body: jsonEncode(<String, dynamic>{
+      'nom': bouteilleModifiee.nom,
+      'cuvee': bouteilleModifiee.cuvee,
+      'region': bouteilleModifiee.Region,
+      'categorie': bouteilleModifiee.categorie,
+      'date_recolte': bouteilleModifiee.dateRecolt,
+      'caveId': bouteilleModifiee.caveId,
+      'emplacement': bouteilleModifiee.emplacement,
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    return true;
+  } else {
     return false;
   }
 }

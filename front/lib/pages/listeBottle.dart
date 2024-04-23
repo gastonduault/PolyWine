@@ -76,45 +76,56 @@ class caveScreen extends StatelessWidget {
                     height: MediaQuery.of(context).size.height,
                     child: Column(
                       children: [
-                        ElevatedButton(
-                          style: ButtonStyle(
-                            padding: MaterialStateProperty.all(
-                                const EdgeInsets.all(0)),
-                            backgroundColor:
-                                MaterialStateProperty.all(background_color),
-                            shape: MaterialStateProperty.all<CircleBorder>(
-                              CircleBorder(),
-                            ),
-                          ),
-                          child: Image.asset(
-                            "lib/assets/img/ajouter.png",
-                            width: 16,
-                          ),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => AjoutBouteille(),
+                        Visibility(
+                          visible:
+                              snapshot.hasData && snapshot.data!.length < 6,
+                          child: ElevatedButton(
+                            style: ButtonStyle(
+                              padding: MaterialStateProperty.all(
+                                  const EdgeInsets.all(0)),
+                              backgroundColor:
+                                  MaterialStateProperty.all(background_color),
+                              shape: MaterialStateProperty.all<CircleBorder>(
+                                CircleBorder(),
                               ),
-                            );
-                          },
-                        ),
-                        Expanded(
-                          child: GridView.builder(
-                            shrinkWrap: true,
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 20.0,
-                              mainAxisSpacing: 20.0,
-                              childAspectRatio: 0.5,
                             ),
-                            itemCount: snapshot.data!.length,
-                            itemBuilder: (context, index) {
-                              return BouteilleTile(
-                                  bouteille: snapshot.data![index]);
+                            child: Image.asset(
+                              "lib/assets/img/ajouter.png",
+                              width: 16,
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => AjoutBouteille(),
+                                ),
+                              );
                             },
                           ),
+                        ),
+                        Expanded(
+                          child: snapshot.data!.isEmpty
+                              ? Center(
+                                  child: Text(
+                                    'Aucune bouteille dans la cave.',
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                )
+                              : GridView.builder(
+                                  shrinkWrap: true,
+                                  gridDelegate:
+                                      SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    crossAxisSpacing: 20.0,
+                                    mainAxisSpacing: 20.0,
+                                    childAspectRatio: 0.5,
+                                  ),
+                                  itemCount: snapshot.data!.length,
+                                  itemBuilder: (context, index) {
+                                    return BouteilleTile(
+                                        bouteille: snapshot.data![index]);
+                                  },
+                                ),
                         ),
                         SizedBox(
                           height: 100,

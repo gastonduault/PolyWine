@@ -35,6 +35,7 @@ class MyApp extends StatelessWidget {
 class MyAppState extends ChangeNotifier {
   var caveID = null;
   var bouteilleID = null;
+
   Bouteille bouteilleEnAjout = Bouteille(
       nom: "",
       cuvee: "",

@@ -1,22 +1,38 @@
+import 'package:project_app/fetch/bouteille.dart';
+import './bluetooth/bluetooth_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
-import '../pages/caseBottle.dart';
+import './bluetooth/bluetooth.dart';
 import '../assets/colors.dart';
+import 'listeBottle.dart';
 import '../main.dart';
 
-class AjoutBouteille extends StatefulWidget {
-  AjoutBouteille({Key? key}) : super(key: key);
+class bottlePage extends StatefulWidget {
+  final Bouteille bouteille;
+
+  const bottlePage({Key? key, required this.bouteille}) : super(key: key);
+
   @override
-  _AjoutBouteilleState createState() => _AjoutBouteilleState();
+  _bottlePage createState() => _bottlePage();
 }
 
-class _AjoutBouteilleState extends State<AjoutBouteille> {
+class _bottlePage extends State<bottlePage> {
   String? _selectedRegion;
   late DateTime _selectedDate;
-
   TextEditingController _nomBouteilleController = TextEditingController();
   TextEditingController _cuveeBouteilleController = TextEditingController();
   TextEditingController _regionController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _nomBouteilleController = TextEditingController(text: widget.bouteille.nom);
+    _cuveeBouteilleController =
+        TextEditingController(text: widget.bouteille.cuvee);
+    _regionController = TextEditingController(text: widget.bouteille.Region);
+    _selectedRegion = widget.bouteille.categorie;
+    _selectedDate = DateTime(widget.bouteille.dateRecolt);
+  }
 
   @override
   void dispose() {
@@ -27,16 +43,10 @@ class _AjoutBouteilleState extends State<AjoutBouteille> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    _selectedDate = DateTime.now(); // Initialiser la date avec la date actuelle
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Ajout d'une bouteille"),
+        title: const Text("info de la bouteille"),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -150,7 +160,7 @@ class _AjoutBouteilleState extends State<AjoutBouteille> {
                 child: Row(
                   children: [
                     Text(
-                      "Ajout Cave",
+                      "Modifier la bouteille",
                       style: TextStyle(color: font_black),
                     ),
                     SizedBox(width: 10),
@@ -158,13 +168,13 @@ class _AjoutBouteilleState extends State<AjoutBouteille> {
                       Icons.add,
                       color: font_pink,
                       size: 24.0,
-                      semanticLabel: 'ajout bouteille',
+                      semanticLabel: 'modifier bouteil',
                     ),
                   ],
                 ),
                 onPressed: () {
                   if (_validerChamps()) {
-                    clickAjoutBouteille();
+                    clickModifier(context, widget.bouteille);
                   }
                 }),
           ],
@@ -216,23 +226,40 @@ class _AjoutBouteilleState extends State<AjoutBouteille> {
     return true;
   }
 
-  void clickAjoutBouteille() async {
+  void clickModifier(BuildContext context, Bouteille bouteille) async {
     var appState = context.read<MyAppState>();
-    var caveId = appState.caveID;
+    appState.bouteilleEnAjout = bouteille;
 
-    appState.bouteilleEnAjout.nom = _nomBouteilleController.text;
-    appState.bouteilleEnAjout.cuvee = _cuveeBouteilleController.text;
-    appState.bouteilleEnAjout.Region = _regionController.text;
-    appState.bouteilleEnAjout.categorie = _selectedRegion ?? "rouge";
-    appState.bouteilleEnAjout.dateRecolt = _selectedDate.year;
-    appState.bouteilleEnAjout.caveId = caveId;
-    appState.bouteilleEnAjout.emplacement = 0;
+    bool modification = await fetchModifierBouteille(appState.bouteilleEnAjout);
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => caseBottle(),
-      ),
-    );
+    if (modification) {
+      print("bouteille modifié");
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => caveScreen(),
+        ),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Text('Échec de la modification de la bouteille.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  //TODO: a regarder après
+                  Navigator.of(context).pop();
+                },
+                child: Center(
+                  child: Text('OK'),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 }

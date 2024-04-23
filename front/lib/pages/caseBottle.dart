@@ -74,6 +74,7 @@ class caseBottle extends StatelessWidget {
                   );
 
                   for (var bouteille in snapshot.data!) {
+                    print(bouteille.emplacement);
                     emplacementsLibres.remove(bouteille.emplacement);
                   }
 
@@ -88,7 +89,7 @@ class caseBottle extends StatelessWidget {
                     items: emplacementsLibres
                         .map((emplacement) => DropdownMenuItem<int>(
                               value: emplacement,
-                              child: Text('Emplacement $emplacement'),
+                              child: Text('Emplacement ${emplacement}'),
                             ))
                         .toList(),
                   );
@@ -124,6 +125,7 @@ class caseBottle extends StatelessWidget {
             actions: <Widget>[
               TextButton(
                 onPressed: () {
+                  //TODO: a regarder après
                   Navigator.of(context).pop();
                 },
                 child: Center(

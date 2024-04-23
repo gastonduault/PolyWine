@@ -1,10 +1,11 @@
-import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
 import '../fetch/bouteille.dart';
 import '../assets/colors.dart';
-import './home.dart';
-
+import './bottlePage.dart';
+import '../main.dart';
 
 class BouteilleTile extends StatelessWidget {
   final Bouteille bouteille;
@@ -15,12 +16,7 @@ class BouteilleTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const Home(),
-          ),
-        );
+        clickBottle(context, bouteille);
       },
       style: ButtonStyle(
         backgroundColor: MaterialStateProperty.all(white),
@@ -82,4 +78,17 @@ class BouteilleTile extends StatelessWidget {
       ),
     );
   }
+}
+
+void clickBottle(BuildContext context, Bouteille bouteille) async {
+  var appState = context.read<MyAppState>();
+  appState.bouteilleEnAjout = bouteille;
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => bottlePage(
+        bouteille: bouteille,
+      ),
+    ),
+  );
 }

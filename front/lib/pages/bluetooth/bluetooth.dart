@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:provider/provider.dart';
+import 'bluetooth_manager.dart';
 
 class ScanPage extends StatefulWidget {
   const ScanPage({Key? key}) : super(key: key);
@@ -37,11 +40,6 @@ class _ScanPageState extends State<ScanPage> {
     });
   }
 
-  void connectToDevice(BluetoothDevice device) async {
-    await device.connect();
-    // Ici, vous pouvez ajouter votre logique après la connexion réussie.
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,40 +55,30 @@ class _ScanPageState extends State<ScanPage> {
       body: ListView.builder(
         itemCount: scanResults.length,
         itemBuilder: (context, index) {
-          // Utiliser advertisementData.localName si disponible, sinon device.name, sinon 'Unknown Device'
-          String displayName = scanResults[index].advertisementData.localName ?? 
-                              scanResults[index].device.name ?? 
-                              'Unknown Device';
-          
+          String displayName = scanResults[index].advertisementData.localName ??
+              scanResults[index].device.name ??
+              'Unknown Device';
+
           bool deviceConnected = connectedDevices[scanResults[index].device.id.toString()] ?? false;
 
-          return Container(
-            decoration: BoxDecoration(
-              border: deviceConnected ? Border.all(color: Colors.green, width: 2) : null,
-            ),
-            child: ListTile(
-              title: Text(displayName),
-              subtitle: Text(scanResults[index].device.id.toString()),
-              onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-                  return DeviceDetailPage(
-                    device: scanResults[index].device,
-                    onDeviceConnected: () {
-                      setState(() {
-                        connectedDevices[scanResults[index].device.id.toString()] = true;
-                      });
-                    },
-                  );
-                }));
-              },
-            ),
+          return ListTile(
+            title: Text(displayName),
+            subtitle: Text(scanResults[index].device.id.toString()),
+            leading: Icon(deviceConnected ? Icons.bluetooth_connected : Icons.bluetooth),
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                return DeviceDetailPage(
+                  device: scanResults[index].device,
+                  onDeviceConnected: () {
+                    setState(() {
+                      connectedDevices[scanResults[index].device.id.toString()] = true;
+                    });
+                  },
+                );
+              }));
+              BluetoothManager().connectToDevice(scanResults[index].device);
+            },
           );
-
-          // Optionnel : filtrer et ne pas afficher les appareils qui n'ont pas de nom "humain"
-          // if (displayName.isEmpty || isUUID(displayName)) {
-            // return Container(); // Retourne un conteneur vide pour les noms non souhaités
-          // }
-          
         },
       ),
       floatingActionButton: FloatingActionButton(
@@ -99,19 +87,7 @@ class _ScanPageState extends State<ScanPage> {
       ),
     );
   }
-
-  bool isUUID(String str) {
-    final uuidRegex = RegExp(r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$');
-    return uuidRegex.hasMatch(str);
-  }
-
-  @override
-  void dispose() {
-    FlutterBluePlus.stopScan();
-    super.dispose();
-  }
 }
-
 
 class DeviceDetailPage extends StatefulWidget {
   final BluetoothDevice device;
@@ -125,62 +101,117 @@ class DeviceDetailPage extends StatefulWidget {
 
 class _DeviceDetailPageState extends State<DeviceDetailPage> {
   bool isConnected = false;
+  List<BluetoothService> services = [];
+  String receivedData = ""; // Pour stocker les données reçues
+  TextEditingController commandController = TextEditingController();
+  List<String> terminalLogs = []; // Historique des messages
+
+  final Guid serviceUuid = Guid("0000ffe0-0000-1000-8000-00805f9b34fb"); // Ajusté
+  final Guid characteristicUuid = Guid("0000ffe1-0000-1000-8000-00805f9b34fb"); // Ajusté
+  BluetoothCharacteristic? characteristic;
+
+  @override
+  void initState() {
+    super.initState();
+    // connectAndDiscoverServices();
+  }
+
+  void connectAndDiscoverServices() async {
+    await widget.device.connect();
+    services = await widget.device.discoverServices();
+    for (var service in services) {
+      if (service.uuid == serviceUuid) {
+        for (var char in service.characteristics) {
+          if (char.uuid == characteristicUuid) {
+            characteristic = char;
+            await char.setNotifyValue(true);
+            char.value.listen((value) {
+              setState(() {
+                String receivedMessage = utf8.decode(value);
+                terminalLogs.add("Reçu : $receivedMessage");
+                receivedData = receivedMessage; // Stocke les données reçues
+              });
+            });
+            break;
+          }
+        }
+      }
+    }
+    setState(() {
+      isConnected = true;
+    });
+    widget.onDeviceConnected();
+  }
+
+void sendMessage(String message) async {
+  if (characteristic == null) {
+    print("Caractéristique non disponible.");
+    return;
+  }
+  try {
+    await characteristic!.write(utf8.encode(message), withoutResponse: true);
+    setState(() {
+      terminalLogs.add("Envoyé : $message");
+    });
+  } catch (e) {
+    print("Erreur lors de l'envoi du message : $e");
+    // Affichage facultatif d'un message d'erreur à l'utilisateur
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
-    // Utilisez un Container pour ajouter une bordure conditionnelle
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.device.name ?? "Unknown Device"),
       ),
-      body: Container(
-        // Ajoute une bordure verte si connecté, sinon pas de bordure
-        decoration: BoxDecoration(
-          border: isConnected ? Border.all(color: Colors.green, width: 4) : null,
-        ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+      body: Consumer<BluetoothManager>(
+        builder: (context, manager, child) {
+          return Column(
             children: [
-              Text("ID: ${widget.device.id}"),
-              ElevatedButton(
-                onPressed: isConnected ? null : () async {
-                  try {
-                    await widget.device.connect();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Connexion établie avec ${widget.device.name}'),
-                        backgroundColor: Colors.green,
+              Expanded(
+                child: ListView.builder(
+                  itemCount: manager.messages.length,
+                  itemBuilder: (context, index) => ListTile(
+                    title: Text(manager.messages[index]),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        decoration: InputDecoration(
+                          hintText: "Tapez votre message ici",
+                          border: OutlineInputBorder(),
+                        ),
                       ),
-                    );
-                    setState(() {
-                      isConnected = true; // Mise à jour de l'état pour refléter la connexion réussie
-                    });
-                    widget.onDeviceConnected();
-                    // Plus de logique ici si nécessaire
-                  } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Échec de la connexion'),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
-                },
-                child: Text(isConnected ? 'Connected' : 'Connect'),
+                    ),
+                    IconButton( 
+                      icon: Icon(Icons.send),
+                      onPressed: () {
+                        manager.sendMessage("Hello DSD Tech");
+                      },
+                    ),
+                  ],
+                ),
               ),
             ],
-          ),
-        ),
+          );
+        },
       ),
     );
   }
 
   @override
   void dispose() {
-    if (isConnected) {
-      widget.device.disconnect();
-    }
+    // if (isConnected) {
+    //   widget.device.disconnect();
+    // }
+    // FlutterBluePlus.stopScan();
     super.dispose();
   }
 }

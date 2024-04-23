@@ -3,8 +3,9 @@ import 'package:provider/provider.dart';
 import 'pages/home.dart';
 import 'assets/colors.dart';
 
-
-void main() { runApp(MyApp()); }
+void main() {
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -26,4 +27,3 @@ class MyApp extends StatelessWidget {
 }
 
 class MyAppState extends ChangeNotifier {}
-

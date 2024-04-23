@@ -1,16 +1,18 @@
+import './bluetooth/bluetooth_manager.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import './bluetooth/bluetooth.dart';
 import '../assets/colors.dart';
 import 'listeBottle.dart';
-import 'package:provider/provider.dart';
-import './bluetooth/bluetooth_manager.dart';
-
+import '../main.dart';
 
 class Home extends StatelessWidget {
   const Home({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Choisir une cave'),
@@ -23,10 +25,15 @@ class Home extends StatelessWidget {
             builder: (context, manager, child) {
               return Column(
                 children: [
-                  Text("Il y a ${manager.nbBouteilles} bouteilles dans la cave à vin", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  Text("Les emplacements ${manager.occupiedLocations.join(", ")} de la cave à vin sont occupés"),
+                  Text(
+                      "Il y a ${manager.nbBouteilles} bouteilles dans la cave à vin",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  Text(
+                      "Les emplacements ${manager.occupiedLocations.join(", ")} de la cave à vin sont occupés"),
                   if (manager.lastModifiedLocation != null)
-                    Text("L'emplacement ${manager.lastModifiedLocation} a été le dernier modifié"),
+                    Text(
+                        "L'emplacement ${manager.lastModifiedLocation} a été le dernier modifié"),
                 ],
               );
             },
@@ -114,12 +121,11 @@ class Home extends StatelessWidget {
                   ],
                 ),
                 onPressed: () {
+                  appState.caveID = 1;
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const caveScreen(
-                        caveid: 1,
-                      ),
+                      builder: (context) => const caveScreen(),
                     ),
                   );
                 },
@@ -138,8 +144,7 @@ class Home extends StatelessWidget {
                       ),
                     ),
                     padding:
-                        MaterialStateProperty.all(const EdgeInsets.all(20))
-                ),
+                        MaterialStateProperty.all(const EdgeInsets.all(20))),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -159,12 +164,11 @@ class Home extends StatelessWidget {
                   ],
                 ),
                 onPressed: () {
+                  appState.caveID = 2;
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const caveScreen(
-                        caveid: 4,
-                      ),
+                      builder: (context) => const caveScreen(),
                     ),
                   );
                 },

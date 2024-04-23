@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'url.dart';
 
-
 class Bouteille {
   final String categorie;
   final int caveId;
@@ -20,7 +19,6 @@ class Bouteille {
     required this.Region,
   });
 
-
   factory Bouteille.fromJson(Map<String, dynamic> json) {
     return Bouteille(
       categorie: json['categorie'] ?? '',
@@ -33,10 +31,9 @@ class Bouteille {
   }
 }
 
-
-
 Future<List<Bouteille>> fetchBouteilles(int id) async {
-  final response = await http.get(Uri.parse(url+'cave/bouteilles/'+id.toString()));
+  final response =
+      await http.get(Uri.parse(url + 'cave/bouteilles/' + id.toString()));
 
   if (response.statusCode == 200) {
     final List<dynamic> bouteillesJson =
@@ -47,9 +44,7 @@ Future<List<Bouteille>> fetchBouteilles(int id) async {
   }
 }
 
-
-
-Future<void> ajouterBouteille(Bouteille nouvelleBouteille) async {
+Future<bool> fetchAjouterBouteille(Bouteille nouvelleBouteille) async {
   final response = await http.post(
     Uri.parse(url + 'bouteilles'),
     headers: <String, String>{
@@ -66,9 +61,9 @@ Future<void> ajouterBouteille(Bouteille nouvelleBouteille) async {
   );
 
   if (response.statusCode == 200) {
-    print(response.body);
+    return true;
   } else {
-    throw Exception('Failed to add bottle');
+    // throw Exception('Failed to add bottle');
+    return false;
   }
-
 }

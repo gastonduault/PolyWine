@@ -1,22 +1,20 @@
-import 'dart:async';
+import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import '../fetch/bouteille.dart';
 import '../assets/colors.dart';
 import '../fetch/cave.dart';
 import './addBottle.dart';
 import 'bottleTile.dart';
+import '../main.dart';
+import 'dart:async';
 
 class caveScreen extends StatelessWidget {
-  final int caveId;
-
-  const caveScreen({Key? key, required int caveid})
-      : caveId = caveid,
-        super(key: key);
-
+  const caveScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-
+    var appState = context.watch<MyAppState>();
+    var caveId = appState.caveID;
     late Future<List<Bouteille>> futureBouteilles = fetchBouteilles(caveId);
     late Future<Cave> futureCave = fetchCave(caveId);
 
@@ -74,9 +72,7 @@ class caveScreen extends StatelessWidget {
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return SizedBox(
-                    height: MediaQuery.of(context)
-                        .size
-                        .height,
+                    height: MediaQuery.of(context).size.height,
                     child: Column(
                       children: [
                         ElevatedButton(
@@ -97,9 +93,7 @@ class caveScreen extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => AjoutBouteille(
-                                  caveid: caveId,
-                                ),
+                                builder: (context) => AjoutBouteille(),
                               ),
                             );
                           },
@@ -121,7 +115,9 @@ class caveScreen extends StatelessWidget {
                             },
                           ),
                         ),
-                        SizedBox(height: 100,)
+                        SizedBox(
+                          height: 100,
+                        )
                       ],
                     ),
                   );

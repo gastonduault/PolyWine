@@ -1,20 +1,18 @@
+import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
+import '../pages/listeBottle.dart';
 import '../fetch/bouteille.dart';
 import '../assets/colors.dart';
+import '../main.dart';
 
 class AjoutBouteille extends StatefulWidget {
-  final int caveId;
-
-  AjoutBouteille({Key? key, required int caveid})
-      : caveId = caveid,
-        super(key: key);
+  AjoutBouteille({Key? key}) : super(key: key);
 
   @override
   _AjoutBouteilleState createState() => _AjoutBouteilleState();
 }
 
 class _AjoutBouteilleState extends State<AjoutBouteille> {
-
   String? _selectedRegion;
   late DateTime _selectedDate;
 
@@ -38,6 +36,9 @@ class _AjoutBouteilleState extends State<AjoutBouteille> {
 
   @override
   Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    var caveId = appState.caveID;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Ajout d'une bouteille"),
@@ -46,7 +47,6 @@ class _AjoutBouteilleState extends State<AjoutBouteille> {
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-
           children: [
             TextFormField(
               controller:
@@ -131,29 +131,29 @@ class _AjoutBouteilleState extends State<AjoutBouteille> {
               ),
             ),
             ElevatedButton(
-              style: ButtonStyle(
-                  padding: MaterialStateProperty.all(const EdgeInsets.all(15))),
-              child: Row(
-                children: [
-                  Text(
-                    "Ajout Cave",
-                    style: TextStyle(color: font_black),
-                  ),
-                  SizedBox(width: 10),
-                  Icon(
-                    Icons.add,
-                    color: font_pink,
-                    size: 24.0,
-                    semanticLabel: 'ajout bouteille',
-                  ),
-                ],
-              ),
-              onPressed: () {
-                if(_validerChamps()){
-                  clickAjoutBouteille();
-                }
-              }
-            ),
+                style: ButtonStyle(
+                    padding:
+                        MaterialStateProperty.all(const EdgeInsets.all(15))),
+                child: Row(
+                  children: [
+                    Text(
+                      "Ajout Cave",
+                      style: TextStyle(color: font_black),
+                    ),
+                    SizedBox(width: 10),
+                    Icon(
+                      Icons.add,
+                      color: font_pink,
+                      size: 24.0,
+                      semanticLabel: 'ajout bouteille',
+                    ),
+                  ],
+                ),
+                onPressed: () {
+                  if (_validerChamps()) {
+                    clickAjoutBouteille();
+                  }
+                }),
           ],
         ),
       ),
@@ -190,7 +190,9 @@ class _AjoutBouteilleState extends State<AjoutBouteille> {
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: Center(child: Text('OK'),),
+                child: Center(
+                  child: Text('OK'),
+                ),
               ),
             ],
           );
@@ -201,7 +203,9 @@ class _AjoutBouteilleState extends State<AjoutBouteille> {
     return true;
   }
 
-  void clickAjoutBouteille() {
+  void clickAjoutBouteille() async {
+    var appState = context.read<MyAppState>();
+    var caveId = appState.caveID;
 
     Bouteille nouvelleBouteille = Bouteille(
       nom: _nomBouteilleController.text,
@@ -209,10 +213,38 @@ class _AjoutBouteilleState extends State<AjoutBouteille> {
       Region: _regionController.text,
       categorie: 'rouge',
       dateRecolt: _selectedDate.year,
-      caveId: widget.caveId,
+      caveId: caveId,
     );
 
-    ajouterBouteille(nouvelleBouteille);
+    bool ajout = await fetchAjouterBouteille(nouvelleBouteille);
 
+    if (ajout) {
+      print("bouteille ajoutée");
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => caveScreen(),
+        ),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Text('Échec de l\'ajout de la bouteille.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Center(
+                  child: Text('OK'),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 }

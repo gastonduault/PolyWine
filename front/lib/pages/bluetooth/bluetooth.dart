@@ -20,7 +20,7 @@ class _ScanPageState extends State<ScanPage> {
   bool isScanning = false;
   Map<String, bool> connectedDevices = {};
   late BluetoothManager _bluetoothManager;
-  StreamSubscription? scanSubscription; // Add this line
+  StreamSubscription? scanSubscription;
 
   @override
   void initState() {
@@ -30,7 +30,7 @@ class _ScanPageState extends State<ScanPage> {
 
   @override
   void dispose() {
-    scanSubscription?.cancel(); // Cancel the subscription
+    scanSubscription?.cancel();
     super.dispose();
   }
 
@@ -68,45 +68,49 @@ class _ScanPageState extends State<ScanPage> {
         itemBuilder: (context, index) {
           String displayName = scanResults[index].advertisementData.localName ??
               scanResults[index].device.name ??
-              'Unknown Device';
+              '';
 
-          bool deviceConnected =
-              connectedDevices[scanResults[index].device.id.toString()] ??
-                  false;
+          if (displayName.isNotEmpty) {
+            bool deviceConnected =
+                connectedDevices[scanResults[index].device.id.toString()] ??
+                    false;
 
-          return ListTile(
-            title: Text(displayName),
-            subtitle: Text(scanResults[index].device.id.toString()),
-            leading: Icon(
-                deviceConnected ? Icons.bluetooth_connected : Icons.bluetooth),
-            onTap: () {
-              final manager =
-                  Provider.of<BluetoothManager>(context, listen: false);
-              _bluetoothManager =
-                  Provider.of<BluetoothManager>(context, listen: false);
-              manager.connectToDevice(scanResults[index].device);
-              Provider.of<BluetoothManager>(context, listen: false)
-                  .sendMessage("OK");
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => Home(),
-                ),
-              );
-              // Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-              //   return DeviceDetailPage(
-              //     device: scanResults[index].device,
-              //     onDeviceConnected: () {
-              //       setState(() {
-              //         connectedDevices[
-              //             scanResults[index].device.id.toString()] = true;
-              //       });
-              //     },
-              //   );
-              // }));
-              // BluetoothManager().connectToDevice(scanResults[index].device);
-            },
-          );
+            return ListTile(
+              title: Text(displayName),
+              subtitle: Text(scanResults[index].device.id.toString()),
+              leading: Icon(
+                  deviceConnected ? Icons.bluetooth_connected : Icons.bluetooth),
+              onTap: () {
+                final manager =
+                    Provider.of<BluetoothManager>(context, listen: false);
+                _bluetoothManager =
+                    Provider.of<BluetoothManager>(context, listen: false);
+                manager.connectToDevice(scanResults[index].device);
+                Provider.of<BluetoothManager>(context, listen: false)
+                    .sendMessage("OK");
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Home(),
+                  ),
+                );
+                // Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                //   return DeviceDetailPage(
+                //     device: scanResults[index].device,
+                //     onDeviceConnected: () {
+                //       setState(() {
+                //         connectedDevices[
+                //             scanResults[index].device.id.toString()] = true;
+                //       });
+                //     },
+                //   );
+                // }));
+                // BluetoothManager().connectToDevice(scanResults[index].device);
+              },
+            );
+          } else {
+            return Container();
+          }
         },
       ),
       floatingActionButton: FloatingActionButton(
@@ -128,7 +132,7 @@ class DeviceDetailPage extends StatefulWidget {
 }
 
 class _DeviceDetailPageState extends State<DeviceDetailPage> {
-  List<String> logs = []; // Ajout d'une liste pour stocker les logs
+  List<String> logs = [];
   late BluetoothManager _bluetoothManager;
 
   @override

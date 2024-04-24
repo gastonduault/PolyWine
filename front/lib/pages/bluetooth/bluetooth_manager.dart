@@ -23,11 +23,9 @@ class BluetoothManager with ChangeNotifier {
 
   Future<void> connectToDevice(BluetoothDevice device) async {
     if (connectedDevice != null && connectedDevice == device && connectedCharacteristic != null) {
-      // Already connected and listening to this device
       return;
     }
 
-    // Disconnect from any previous device
     if (connectedDevice != null && connectedDevice != device) {
       disconnect();
     }
@@ -35,7 +33,7 @@ class BluetoothManager with ChangeNotifier {
     connectedDevice = device;
     try {
       await connectedDevice!.connect();
-      isConnected = true;  // Mise à jour de l'état de connexion
+      isConnected = true;
       List<BluetoothService> services = await connectedDevice!.discoverServices();
       for (var service in services) {
         if (service.uuid == Guid("0000ffe0-0000-1000-8000-00805f9b34fb")) {
@@ -55,7 +53,7 @@ class BluetoothManager with ChangeNotifier {
         }
       }
     } catch (e) {
-      isConnected = false;  // Mise à jour de l'état de connexion en cas d'échec
+      isConnected = false;
       print('Failed to connect: $e');
     }
     notifyListeners();
@@ -64,7 +62,6 @@ class BluetoothManager with ChangeNotifier {
   void updateCaveState(String message) {
     message = message.trim();
     if (message.isEmpty || !message.contains(':')) {
-      // print("Message reçu vide ou mal formé.");
       return;
     }
 
@@ -88,35 +85,28 @@ class BluetoothManager with ChangeNotifier {
 
 
   void processBottleArray(List<int> newBottleArray) {
-    // Inverser le tableau pour que le premier élément corresponde au dernier emplacement dans l'interface utilisateur
     newBottleArray = List.from(newBottleArray.reversed);
 
-    // Initialisation de la variable pour suivre le dernier emplacement modifié lors de cette mise à jour
     int? newlyModifiedLocation;
 
-    // Comparaison des tableaux uniquement si lastBottleArray a été initialisé
     if (lastBottleArray.isNotEmpty) {
       for (int i = 0; i < newBottleArray.length; i++) {
-        // Détecter le dernier emplacement modifié en comparant l'ancien et le nouveau tableau
         if (newBottleArray[i] != lastBottleArray[i]) {
-          newlyModifiedLocation = i + 1;  // Index ajusté pour l'affichage (commence à 1)
+          newlyModifiedLocation = i + 1;
         }
       }
     }
 
-    // Mise à jour du dernier tableau connu
     lastBottleArray = List.from(newBottleArray);
     nbBouteilles = newBottleArray.where((b) => b == 1).length;
 
-    // Mise à jour des emplacements occupés
     occupiedLocations.clear();
     for (int i = 0; i < newBottleArray.length; i++) {
       if (newBottleArray[i] == 1) {
-        occupiedLocations.add(i + 1); // Supposons que l'indexation commence à 1 pour les emplacements
+        occupiedLocations.add(i + 1);
       }
     }
 
-    // Mise à jour du dernier emplacement modifié, si un changement a été détecté
     if (newlyModifiedLocation != null) {
       lastModifiedLocation = newlyModifiedLocation;
     } else {
@@ -124,7 +114,7 @@ class BluetoothManager with ChangeNotifier {
     }
 
     print("Mise à jour - isConnected: $isConnected - nbBouteilles: $nbBouteilles, OccupiedLocations: $occupiedLocations, LastModifiedLocation: $lastModifiedLocation");
-    notifyListeners(); // Notifiez les widgets consommateurs après la mise à jour de l'état
+    notifyListeners();
   }
 
 
@@ -148,12 +138,12 @@ class BluetoothManager with ChangeNotifier {
 
   void sendMessage(String message) async {
     if (connectedCharacteristic != null) {
-      print("Envoi du message : $message"); // Ajouter pour le débogage
+      print("Envoi du message : $message");
       await connectedCharacteristic!.write(utf8.encode(message), withoutResponse: true);
       messages.add("Envoyé : $message");
       notifyListeners();
     } else {
-      print("Caractéristique non disponible."); // Ajouter pour le débogage
+      print("Caractéristique non disponible.");
     }
   }
 }

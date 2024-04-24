@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:provider/provider.dart';
 import 'bluetooth_manager.dart';
+import '../home.dart';
 
 class ScanPage extends StatefulWidget {
   const ScanPage({Key? key}) : super(key: key);
@@ -100,65 +101,15 @@ class DeviceDetailPage extends StatefulWidget {
 }
 
 class _DeviceDetailPageState extends State<DeviceDetailPage> {
-  bool isConnected = false;
-  List<BluetoothService> services = [];
-  String receivedData = ""; // Pour stocker les données reçues
-  TextEditingController commandController = TextEditingController();
-  List<String> terminalLogs = []; // Historique des messages
-
-  final Guid serviceUuid = Guid("0000ffe0-0000-1000-8000-00805f9b34fb"); // Ajusté
-  final Guid characteristicUuid = Guid("0000ffe1-0000-1000-8000-00805f9b34fb"); // Ajusté
-  BluetoothCharacteristic? characteristic;
+  List<String> logs = []; // Ajout d'une liste pour stocker les logs
 
   @override
   void initState() {
     super.initState();
-    // connectAndDiscoverServices();
+    // Connexion au dispositif via BluetoothManager
+    final manager = Provider.of<BluetoothManager>(context, listen: false);
+    manager.connectToDevice(widget.device);
   }
-
-  void connectAndDiscoverServices() async {
-    await widget.device.connect();
-    services = await widget.device.discoverServices();
-    for (var service in services) {
-      if (service.uuid == serviceUuid) {
-        for (var char in service.characteristics) {
-          if (char.uuid == characteristicUuid) {
-            characteristic = char;
-            await char.setNotifyValue(true);
-            char.value.listen((value) {
-              setState(() {
-                String receivedMessage = utf8.decode(value);
-                terminalLogs.add("Reçu : $receivedMessage");
-                receivedData = receivedMessage; // Stocke les données reçues
-              });
-            });
-            break;
-          }
-        }
-      }
-    }
-    setState(() {
-      isConnected = true;
-    });
-    widget.onDeviceConnected();
-  }
-
-void sendMessage(String message) async {
-  if (characteristic == null) {
-    print("Caractéristique non disponible.");
-    return;
-  }
-  try {
-    await characteristic!.write(utf8.encode(message), withoutResponse: true);
-    setState(() {
-      terminalLogs.add("Envoyé : $message");
-    });
-  } catch (e) {
-    print("Erreur lors de l'envoi du message : $e");
-    // Affichage facultatif d'un message d'erreur à l'utilisateur
-  }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -168,39 +119,15 @@ void sendMessage(String message) async {
       ),
       body: Consumer<BluetoothManager>(
         builder: (context, manager, child) {
-          return Column(
-            children: [
-              Expanded(
-                child: ListView.builder(
-                  itemCount: manager.messages.length,
-                  itemBuilder: (context, index) => ListTile(
-                    title: Text(manager.messages[index]),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        decoration: InputDecoration(
-                          hintText: "Tapez votre message ici",
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
-                    ),
-                    IconButton( 
-                      icon: Icon(Icons.send),
-                      onPressed: () {
-                        manager.sendMessage("Hello DSD Tech");
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ],
+          return ListView(
+            children: manager.messages.map((msg) => ListTile(title: Text(msg))).toList(),
           );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.send),
+        onPressed: () {
+          Provider.of<BluetoothManager>(context, listen: false).sendMessage("OK");
         },
       ),
     );
@@ -208,10 +135,7 @@ void sendMessage(String message) async {
 
   @override
   void dispose() {
-    // if (isConnected) {
-    //   widget.device.disconnect();
-    // }
-    // FlutterBluePlus.stopScan();
+    Provider.of<BluetoothManager>(context, listen: false).disconnect();
     super.dispose();
   }
 }

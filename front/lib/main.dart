@@ -32,6 +32,8 @@ class MyApp extends StatelessWidget {
   }
 }
 
+class BluetoothManager extends ChangeNotifier {}
+
 class MyAppState extends ChangeNotifier {
   var caveID = null;
   var bouteilleID = null;

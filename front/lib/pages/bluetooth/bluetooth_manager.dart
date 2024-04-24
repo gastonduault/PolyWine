@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:flutter/foundation.dart';
 
 class BluetoothManager with ChangeNotifier {
   static final BluetoothManager _instance = BluetoothManager._internal();
@@ -14,9 +15,11 @@ class BluetoothManager with ChangeNotifier {
   List<String> messages = []; // Liste pour stocker les messages reçus en provenance de l'Arduio
   List<int> bottleArray = []; // Tableau pour stocker l'état de la cave 
   int nbBouteilles = 0; // Nombre de bouteilles dans la cave
-   List<int> lastBottleArray = [];
+  List<int> lastBottleArray = [];
   List<int> occupiedLocations = [];  // Pour stocker les emplacements occupés
   int? lastModifiedLocation;  // Pour stocker le dernier emplacement modifié
+  bool isConnected = false;
+
 
   Future<void> connectToDevice(BluetoothDevice device) async {
     if (connectedDevice != null && connectedDevice == device && connectedCharacteristic != null) {
@@ -30,63 +33,98 @@ class BluetoothManager with ChangeNotifier {
     }
 
     connectedDevice = device;
-    await connectedDevice!.connect();
-    List<BluetoothService> services = await connectedDevice!.discoverServices();
-    for (var service in services) {
-      if (service.uuid == Guid("0000ffe0-0000-1000-8000-00805f9b34fb")) {
-        for (var char in service.characteristics) {
-          if (char.uuid == Guid("0000ffe1-0000-1000-8000-00805f9b34fb")) {
-            connectedCharacteristic = char;
-            await char.setNotifyValue(true);
-            char.value.listen((value) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                String receivedMessage = utf8.decode(value);
-                updateCaveState(receivedMessage);
+    try {
+      await connectedDevice!.connect();
+      isConnected = true;  // Mise à jour de l'état de connexion
+      List<BluetoothService> services = await connectedDevice!.discoverServices();
+      for (var service in services) {
+        if (service.uuid == Guid("0000ffe0-0000-1000-8000-00805f9b34fb")) {
+          for (var char in service.characteristics) {
+            if (char.uuid == Guid("0000ffe1-0000-1000-8000-00805f9b34fb")) {
+              connectedCharacteristic = char;
+              await char.setNotifyValue(true);
+              char.value.listen((value) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  String receivedMessage = utf8.decode(value);
+                  updateCaveState(receivedMessage);
+                });
               });
-            });
-            break;
+              break;
+            }
           }
         }
       }
+    } catch (e) {
+      isConnected = false;  // Mise à jour de l'état de connexion en cas d'échec
+      print('Failed to connect: $e');
     }
     notifyListeners();
   }
 
   void updateCaveState(String message) {
-    message = message.trim();  // Nettoie les espaces avant et après
-    if (message.isEmpty) {
-      print("Message reçu vide ou composé uniquement d'espaces.");
-      return;  // Ignore ce message
-    }  
-
-    print("Message reçu : $message");  // Affiche chaque message reçu pour le débogage
+    message = message.trim();
+    if (message.isEmpty || !message.contains(':')) {
+      // print("Message reçu vide ou mal formé.");
+      return;
+    }
 
     int colonIndex = message.indexOf(": ");
     if (colonIndex != -1 && message.length > colonIndex + 2) {
-        var numericPart = message.substring(colonIndex + 2).trim();
-        try {
-            List<int> currentBottleArray = numericPart.split('').map(int.parse).toList();
-            occupiedLocations.clear();
-            lastModifiedLocation = null;
-
-            for (int i = 0; i < currentBottleArray.length; i++) {
-                if (currentBottleArray[i] == 1) {
-                    occupiedLocations.add(i + 1);
-                    if (lastBottleArray.isEmpty || lastBottleArray[i] == 0) {
-                        lastModifiedLocation = i + 1;
-                    }
-                }
-            }
-
-            lastBottleArray = List.from(currentBottleArray);
-            nbBouteilles = occupiedLocations.length;
-            notifyListeners();
-        } catch (e) {
-            print('Erreur lors de la conversion du message : $e');
-        }
+      var numericPart = message.substring(colonIndex + 2).trim();
+      try {
+        List<int> currentBottleArray = numericPart.split('').map(int.parse).toList();
+        if (currentBottleArray.length == 6) { // Modifiez '6' selon le nombre d'emplacements dans votre cave
+        processBottleArray(currentBottleArray);
+        } else {
+        print("Erreur: Le tableau reçu ne contient pas le nombre attendu d'éléments.");
+       }
+      } catch (e) {
+        print('Erreur lors de la conversion du message : $e');
+      }
     } else {
-        print("Format du message incorrect ou message trop court.");
+      print("Format du message incorrect ou message trop court.");
     }
+  }
+
+
+  void processBottleArray(List<int> newBottleArray) {
+    // Inverser le tableau pour que le premier élément corresponde au dernier emplacement dans l'interface utilisateur
+    newBottleArray = List.from(newBottleArray.reversed);
+
+    // Initialisation de la variable pour suivre le dernier emplacement modifié lors de cette mise à jour
+    int? newlyModifiedLocation;
+
+    // Comparaison des tableaux uniquement si lastBottleArray a été initialisé
+    if (lastBottleArray.isNotEmpty) {
+      for (int i = 0; i < newBottleArray.length; i++) {
+        // Détecter le dernier emplacement modifié en comparant l'ancien et le nouveau tableau
+        if (newBottleArray[i] != lastBottleArray[i]) {
+          newlyModifiedLocation = i + 1;  // Index ajusté pour l'affichage (commence à 1)
+        }
+      }
+    }
+
+    // Mise à jour du dernier tableau connu
+    lastBottleArray = List.from(newBottleArray);
+    nbBouteilles = newBottleArray.where((b) => b == 1).length;
+
+    // Mise à jour des emplacements occupés
+    occupiedLocations.clear();
+    for (int i = 0; i < newBottleArray.length; i++) {
+      if (newBottleArray[i] == 1) {
+        occupiedLocations.add(i + 1); // Supposons que l'indexation commence à 1 pour les emplacements
+      }
+    }
+
+    // Mise à jour du dernier emplacement modifié, si un changement a été détecté
+    if (newlyModifiedLocation != null) {
+      lastModifiedLocation = newlyModifiedLocation;
+    } else {
+      lastModifiedLocation ??= occupiedLocations.isNotEmpty ? occupiedLocations.last : null;
+    }
+
+    print("Mise à jour - isConnected: $isConnected - nbBouteilles: $nbBouteilles, OccupiedLocations: $occupiedLocations, LastModifiedLocation: $lastModifiedLocation");
+    notifyListeners(); // Notifiez les widgets consommateurs après la mise à jour de l'état
   }
 
 
@@ -98,17 +136,24 @@ class BluetoothManager with ChangeNotifier {
   void disconnect() async {
     if (connectedDevice != null) {
       await connectedDevice!.disconnect();
+      connectedDevice = null;
+      connectedCharacteristic = null;
+      notifyListeners();
     }
-    connectedDevice = null;
-    connectedCharacteristic = null;
-    notifyListeners();
+  }
+
+  void manualDisconnect() {
+    disconnect();
   }
 
   void sendMessage(String message) async {
     if (connectedCharacteristic != null) {
+      print("Envoi du message : $message"); // Ajouter pour le débogage
       await connectedCharacteristic!.write(utf8.encode(message), withoutResponse: true);
       messages.add("Envoyé : $message");
       notifyListeners();
+    } else {
+      print("Caractéristique non disponible."); // Ajouter pour le débogage
     }
   }
 }

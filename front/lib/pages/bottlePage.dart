@@ -47,6 +47,15 @@ class _bottlePage extends State<bottlePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("info de la bouteille"),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.delete),
+            color: Colors.red, // Couleur rouge
+            onPressed: () {
+              clickDelete(context, widget.bouteille);
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -224,6 +233,64 @@ class _bottlePage extends State<bottlePage> {
       return false;
     }
     return true;
+  }
+
+  void clickDelete(BuildContext context, Bouteille bouteille) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Confirmation de suppression"),
+          content: Text("Êtes-vous sûr de vouloir supprimer cette bouteille ?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Ferme la boîte de dialogue
+              },
+              child: Text("Annuler"),
+            ),
+            TextButton(
+              onPressed: () async {
+                bool suppression = await fetchSupprimerBouteille(bouteille);
+                if (suppression) {
+                  // Si la suppression réussit, naviguez vers la page précédente ou une autre page
+                  Navigator.of(context).pop();
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => caveScreen(),
+                    ),
+                  );
+                } else {
+                  // Si la suppression échoue, affichez un message d'erreur
+                  Navigator.of(context).pop();
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text("Erreur"),
+                        content:
+                            Text("Échec de la suppression de la bouteille."),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context)
+                                  .pop(); // Ferme la boîte de dialogue
+                            },
+                            child: Text("OK"),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
+              },
+              child: Text("Confirmer"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void clickModifier(BuildContext context, Bouteille bouteille) async {

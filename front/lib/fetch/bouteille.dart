@@ -38,7 +38,7 @@ class Bouteille {
 }
 
 Future<List<Bouteille>> fetchBouteilles(int id) async {
-  final response = await http.get(Uri.parse(url + 'cave/bouteilles/$id'));
+  final response = await http.get(Uri.parse('${url}cave/bouteilles/$id'));
 
   if (response.statusCode == 200) {
     final List<dynamic> bouteillesJson =
@@ -52,7 +52,7 @@ Future<List<Bouteille>> fetchBouteilles(int id) async {
 
 Future<bool> fetchAjouterBouteille(Bouteille nouvelleBouteille) async {
   final response = await http.post(
-    Uri.parse(url + 'bouteilles'),
+    Uri.parse('${url}bouteilles'),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
     },
@@ -78,8 +78,7 @@ Future<bool> fetchAjouterBouteille(Bouteille nouvelleBouteille) async {
 Future<bool> fetchModifierBouteille(Bouteille bouteilleModifiee) async {
   print(bouteilleModifiee.id);
   final response = await http.post(
-    Uri.parse(url +
-        'bouteilles/${bouteilleModifiee.id}'), // Assurez-vous d'avoir un attribut id dans votre classe Bouteille
+    Uri.parse('${url}bouteilles/${bouteilleModifiee.id}'),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
     },
@@ -92,6 +91,21 @@ Future<bool> fetchModifierBouteille(Bouteille bouteilleModifiee) async {
       'caveId': bouteilleModifiee.caveId,
       'emplacement': bouteilleModifiee.emplacement,
     }),
+  );
+
+  if (response.statusCode == 200) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+Future<bool> fetchSupprimerBouteille(Bouteille bouteille) async {
+  final response = await http.delete(
+    Uri.parse('${url}bouteilles/${bouteille.id}'),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
   );
 
   if (response.statusCode == 200) {

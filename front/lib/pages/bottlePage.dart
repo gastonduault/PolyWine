@@ -22,6 +22,7 @@ class _bottlePage extends State<bottlePage> {
   TextEditingController _nomBouteilleController = TextEditingController();
   TextEditingController _cuveeBouteilleController = TextEditingController();
   TextEditingController _regionController = TextEditingController();
+  bool _isActive = false;
 
   @override
   void initState() {
@@ -62,6 +63,29 @@ class _bottlePage extends State<bottlePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("Allumer / Eteindre"),
+                    Text("l'emplacement"),
+                    Switch(
+                      value: _isActive,
+                      onChanged: (value) {
+                        setState(() {
+                          _isActive = value;
+                        });
+                        clickEmplacement(
+                            context, widget.bouteille.emplacement, _isActive);
+                      },
+                    )
+                  ],
+                ),
+              ],
+            ),
             SizedBox(
               height: 10,
             ),
@@ -323,7 +347,6 @@ class _bottlePage extends State<bottlePage> {
             actions: <Widget>[
               TextButton(
                 onPressed: () {
-                  //TODO: a regarder après
                   Navigator.of(context).pop();
                 },
                 child: Center(
@@ -334,6 +357,14 @@ class _bottlePage extends State<bottlePage> {
           );
         },
       );
+    }
+  }
+
+  clickEmplacement(BuildContext context, int emplacement, bool state) {
+    if (state) {
+      print('allumer l\'emplacement $emplacement');
+    } else {
+      print('éteindre l\'emplacement $emplacement');
     }
   }
 }

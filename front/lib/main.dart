@@ -241,6 +241,19 @@ class BluetoothManager with ChangeNotifier {
       print("Caractéristique non disponible."); // Ajouter pour le débogage
     }
   }
+
+  void controlLED(int emplacement, bool turnOn) async {
+    if (connectedCharacteristic != null) {
+      String message = "LED $emplacement ${turnOn ? 'ON' : 'OFF'}";
+      print("Envoi du message : $message");
+
+      await connectedCharacteristic!.write(utf8.encode(message), withoutResponse: true);
+      messages.add("Envoyé : $message");
+      notifyListeners();
+    } else {
+      print("Caractéristique non connectée ou indisponible.");
+    }
+  }
 }
 
 class MyAppState extends ChangeNotifier {

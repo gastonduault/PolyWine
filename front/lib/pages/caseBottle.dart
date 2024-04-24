@@ -1,20 +1,53 @@
-import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
+
 import '../fetch/bouteille.dart';
 import '../assets/colors.dart';
 import './listeBottle.dart';
 import '../main.dart';
 
-class caseBottle extends StatelessWidget {
+class caseBottle extends StatefulWidget {
   const caseBottle({Key? key}) : super(key: key);
+
+  @override
+  _caseBottleState createState() => _caseBottleState();
+}
+
+class _caseBottleState extends State<caseBottle> {
+  late Future<List<Bouteille>> futureBouteilles;
+  late BluetoothManager bluetoothManager;
+  late List<int> lastOccupiedLocations;
+
+  @override
+  void initState() {
+    super.initState();
+    bluetoothManager = context.read<BluetoothManager>();
+    futureBouteilles = fetchBouteilles(context.read<MyAppState>().caveID);
+    lastOccupiedLocations = List.from(bluetoothManager.occupiedLocations);
+    bluetoothManager.addListener(onBluetoothManagerChange);
+  }
+
+  @override
+  void dispose() {
+    bluetoothManager.removeListener(onBluetoothManagerChange);
+    super.dispose();
+  }
+
+  void onBluetoothManagerChange() async {
+    if (bluetoothManager.occupiedLocations.isNotEmpty) {
+      if (lastOccupiedLocations != bluetoothManager.occupiedLocations) {
+        int newLocation = bluetoothManager.occupiedLocations.last;
+        await ajoutBouteille(context, newLocation);
+        lastOccupiedLocations = List.from(bluetoothManager.occupiedLocations);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
-    var bluetooth = appState.bluetoothConnected;
     var caveId = appState.caveID;
-    late Future<List<Bouteille>> futureBouteilles = fetchBouteilles(caveId);
+    var bluetooth = bluetoothManager.isConnected;
 
     return Scaffold(
       appBar: AppBar(
@@ -34,7 +67,7 @@ class caseBottle extends StatelessWidget {
                 children: [
                   Image.asset(
                     "lib/assets/img/bluetooth.png",
-                    width: 16,
+                    width: 22,
                   ),
                   Text("Mettez la bouteille dans votre cave"),
                 ],
@@ -102,7 +135,7 @@ class caseBottle extends StatelessWidget {
     );
   }
 
-  void ajoutBouteille(BuildContext context, int emplacement) async {
+  Future<void> ajoutBouteille(BuildContext context, int emplacement) async {
     var appState = context.read<MyAppState>();
     appState.bouteilleEnAjout.emplacement = emplacement;
 

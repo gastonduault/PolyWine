@@ -201,7 +201,7 @@ class _bottlePage extends State<bottlePage> {
                       Icons.add,
                       color: font_pink,
                       size: 24.0,
-                      semanticLabel: 'modifier bouteil',
+                      semanticLabel: 'modifier bouteille',
                     ),
                   ],
                 ),

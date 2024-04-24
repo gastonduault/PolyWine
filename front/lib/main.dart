@@ -50,8 +50,19 @@ class BluetoothManager with ChangeNotifier {
   int nbBouteilles = 0; // Nombre de bouteilles dans la cave
   List<int> lastBottleArray = [];
   List<int> occupiedLocations = []; // Pour stocker les emplacements occupés
-  int? lastModifiedLocation; // Pour stocker le dernier emplacement modifié
+  int lastModifiedLocation = -1;
   bool isConnected = false;
+  bool watcher = false;
+  Bouteille bouteilleEnAjout = Bouteille(
+      nom: "",
+      cuvee: "",
+      Region: "",
+      categorie: '',
+      dateRecolt: -1,
+      caveId: -1,
+      emplacement: -1);
+
+  int? emplacement;
 
   Future<void> connectToDevice(BluetoothDevice device) async {
     if (connectedDevice != null &&
@@ -124,7 +135,7 @@ class BluetoothManager with ChangeNotifier {
     }
   }
 
-  void processBottleArray(List<int> newBottleArray) {
+  Future<void> processBottleArray(List<int> newBottleArray) async {
     // Inverser le tableau pour que le premier élément corresponde au dernier emplacement dans l'interface utilisateur
     newBottleArray = List.from(newBottleArray.reversed);
 
@@ -156,12 +167,15 @@ class BluetoothManager with ChangeNotifier {
     }
 
     // Mise à jour du dernier emplacement modifié, si un changement a été détecté
-    if (newlyModifiedLocation != null) {
+    if (newlyModifiedLocation != null && watcher) {
+      print("PAAAAASAAAAAGE");
       lastModifiedLocation = newlyModifiedLocation;
-    } else {
-      lastModifiedLocation ??=
-          occupiedLocations.isNotEmpty ? occupiedLocations.last : null;
+      watcher = false;
     }
+    //  else {
+    //   lastModifiedLocation ??=
+    //       occupiedLocations.isNotEmpty ? occupiedLocations.last : null;
+    // }
 
     print(
         "Mise à jour - isConnected: $isConnected - nbBouteilles: $nbBouteilles, OccupiedLocations: $occupiedLocations, LastModifiedLocation: $lastModifiedLocation");

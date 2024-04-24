@@ -1,53 +1,23 @@
-import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import '../fetch/bouteille.dart';
 import '../assets/colors.dart';
 import './listeBottle.dart';
 import '../main.dart';
 
-class caseBottle extends StatefulWidget {
+class caseBottle extends StatelessWidget {
   const caseBottle({Key? key}) : super(key: key);
-
-  @override
-  _caseBottleState createState() => _caseBottleState();
-}
-
-class _caseBottleState extends State<caseBottle> {
-  late Future<List<Bouteille>> futureBouteilles;
-  late BluetoothManager bluetoothManager;
-  late List<int> lastOccupiedLocations;
-
-  @override
-  void initState() {
-    super.initState();
-    bluetoothManager = context.read<BluetoothManager>();
-    futureBouteilles = fetchBouteilles(context.read<MyAppState>().caveID);
-    lastOccupiedLocations = List.from(bluetoothManager.occupiedLocations);
-    bluetoothManager.addListener(onBluetoothManagerChange);
-  }
-
-  @override
-  void dispose() {
-    bluetoothManager.removeListener(onBluetoothManagerChange);
-    super.dispose();
-  }
-
-  void onBluetoothManagerChange() async {
-    if (bluetoothManager.occupiedLocations.isNotEmpty) {
-      if (lastOccupiedLocations != bluetoothManager.occupiedLocations) {
-        int newLocation = bluetoothManager.occupiedLocations.last;
-        await ajoutBouteille(context, newLocation);
-        lastOccupiedLocations = List.from(bluetoothManager.occupiedLocations);
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
-    var caveId = appState.caveID;
+    var bluetoothManager = context.watch<BluetoothManager>();
     var bluetooth = bluetoothManager.isConnected;
+    bluetoothManager.watcher = true;
+
+    var caveId = appState.caveID;
+    late Future<List<Bouteille>> futureBouteilles = fetchBouteilles(caveId);
 
     return Scaffold(
       appBar: AppBar(
@@ -67,9 +37,57 @@ class _caseBottleState extends State<caseBottle> {
                 children: [
                   Image.asset(
                     "lib/assets/img/bluetooth.png",
-                    width: 22,
+                    width: 16,
                   ),
                   Text("Mettez la bouteille dans votre cave"),
+                  ElevatedButton(
+                      style: ButtonStyle(
+                          padding: MaterialStateProperty.all(
+                              const EdgeInsets.all(15))),
+                      child: Row(
+                        children: [
+                          Text(
+                            "Modifier la bouteille",
+                            style: TextStyle(color: font_black),
+                          ),
+                          SizedBox(width: 10),
+                          Icon(
+                            Icons.add,
+                            color: font_pink,
+                            size: 24.0,
+                            semanticLabel: 'Bouteille ajoutée à la cave',
+                          ),
+                        ],
+                      ),
+                      onPressed: () {
+                        print(
+                            'LE lastModifiedLocation EGAL${bluetoothManager.lastModifiedLocation}');
+                        if (bluetoothManager.lastModifiedLocation != -1) {
+                          ajoutBouteille(
+                              context, bluetoothManager.lastModifiedLocation);
+                        } else {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                content: Text(
+                                    'La bouteille n\'est pas présente dans la cave'),
+                                actions: <Widget>[
+                                  TextButton(
+                                    onPressed: () {
+                                      //TODO: a regarder après
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Center(
+                                      child: Text('OK'),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        }
+                      }),
                 ],
               )
             else
@@ -135,7 +153,7 @@ class _caseBottleState extends State<caseBottle> {
     );
   }
 
-  Future<void> ajoutBouteille(BuildContext context, int emplacement) async {
+  void ajoutBouteille(BuildContext context, int emplacement) async {
     var appState = context.read<MyAppState>();
     appState.bouteilleEnAjout.emplacement = emplacement;
 

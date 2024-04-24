@@ -148,27 +148,25 @@ def update_bouteille(bouteille_id):
             db.session.close()
 
 
-#suppression bouteille
-@app.route('/bouteilles/<int:bouteille_id>', methods=['DELETE'])
-def delete_bouteille(bouteille_id):
-    if request.method == 'DELETE':
-        bouteille = Bouteille.query.get(bouteille_id)
+@app.route('/bouteilles/emplacement/<int:emplacement>', methods=['DELETE'])
+def delete_bouteille_par_emplacement(emplacement):
+    bouteille = Bouteille.query.filter_by(emplacement=emplacement).first()
 
-        if not bouteille:
-            return jsonify({'message': 'Bouteille non trouvée'}), 404
+    if not bouteille:
+        return jsonify({'message': 'Bouteille non trouvée à cet emplacement'}), 404
 
-        try:
-            db.session.delete(bouteille)
-            db.session.commit()
-            return jsonify({'message': 'Bouteille supprimée avec succès!'}), 200
-        except Exception as e:
-            db.session.rollback()
-            error_message = f'Erreur lors de la suppression de la bouteille : {str(e)}'
-            print(error_message)  # Affiche l'erreur dans la console Flask
-            return jsonify({'message': error_message}), 500
-        finally:
-            db.session.close()
-
+    try:
+        db.session.delete(bouteille)
+        db.session.commit()
+        return jsonify({'message': 'Bouteille supprimée avec succès!'}), 200
+    except Exception as e:
+        db.session.rollback()
+        error_message = f'Erreur lors de la suppression de la bouteille à l\'emplacement {emplacement} : {str(e)}'
+        print(error_message)  # Affiche l'erreur dans la console Flask
+        return jsonify({'message': error_message}), 500
+    finally:
+        db.session.close()
+        
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5001)

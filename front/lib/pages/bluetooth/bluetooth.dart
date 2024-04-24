@@ -1,9 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:provider/provider.dart';
-import 'bluetooth_manager.dart';
 import '../home.dart';
+import '../../main.dart';
 
 class ScanPage extends StatefulWidget {
   const ScanPage({Key? key}) : super(key: key);
@@ -17,6 +19,8 @@ class _ScanPageState extends State<ScanPage> {
   List<ScanResult> scanResults = [];
   bool isScanning = false;
   Map<String, bool> connectedDevices = {};
+  late BluetoothManager _bluetoothManager;
+  StreamSubscription? scanSubscription; // Add this line
 
   @override
   void initState() {
@@ -24,17 +28,23 @@ class _ScanPageState extends State<ScanPage> {
     startScan();
   }
 
+  @override
+  void dispose() {
+    scanSubscription?.cancel(); // Cancel the subscription
+    super.dispose();
+  }
+
   void startScan() async {
     setState(() {
       isScanning = true;
     });
-    await FlutterBluePlus.startScan(timeout: Duration(seconds: 4));
-
-    FlutterBluePlus.scanResults.listen((results) {
+    scanSubscription = FlutterBluePlus.scanResults.listen((results) {
       setState(() {
         scanResults = results;
       });
     });
+
+    await FlutterBluePlus.startScan(timeout: Duration(seconds: 4));
 
     setState(() {
       isScanning = false;
@@ -60,24 +70,41 @@ class _ScanPageState extends State<ScanPage> {
               scanResults[index].device.name ??
               'Unknown Device';
 
-          bool deviceConnected = connectedDevices[scanResults[index].device.id.toString()] ?? false;
+          bool deviceConnected =
+              connectedDevices[scanResults[index].device.id.toString()] ??
+                  false;
 
           return ListTile(
             title: Text(displayName),
             subtitle: Text(scanResults[index].device.id.toString()),
-            leading: Icon(deviceConnected ? Icons.bluetooth_connected : Icons.bluetooth),
+            leading: Icon(
+                deviceConnected ? Icons.bluetooth_connected : Icons.bluetooth),
             onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-                return DeviceDetailPage(
-                  device: scanResults[index].device,
-                  onDeviceConnected: () {
-                    setState(() {
-                      connectedDevices[scanResults[index].device.id.toString()] = true;
-                    });
-                  },
-                );
-              }));
-              BluetoothManager().connectToDevice(scanResults[index].device);
+              final manager =
+                  Provider.of<BluetoothManager>(context, listen: false);
+              _bluetoothManager =
+                  Provider.of<BluetoothManager>(context, listen: false);
+              manager.connectToDevice(scanResults[index].device);
+              Provider.of<BluetoothManager>(context, listen: false)
+                  .sendMessage("OK");
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Home(),
+                ),
+              );
+              // Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+              //   return DeviceDetailPage(
+              //     device: scanResults[index].device,
+              //     onDeviceConnected: () {
+              //       setState(() {
+              //         connectedDevices[
+              //             scanResults[index].device.id.toString()] = true;
+              //       });
+              //     },
+              //   );
+              // }));
+              // BluetoothManager().connectToDevice(scanResults[index].device);
             },
           );
         },
@@ -102,12 +129,14 @@ class DeviceDetailPage extends StatefulWidget {
 
 class _DeviceDetailPageState extends State<DeviceDetailPage> {
   List<String> logs = []; // Ajout d'une liste pour stocker les logs
+  late BluetoothManager _bluetoothManager;
 
   @override
   void initState() {
     super.initState();
     // Connexion au dispositif via BluetoothManager
     final manager = Provider.of<BluetoothManager>(context, listen: false);
+    _bluetoothManager = Provider.of<BluetoothManager>(context, listen: false);
     manager.connectToDevice(widget.device);
   }
 
@@ -120,22 +149,22 @@ class _DeviceDetailPageState extends State<DeviceDetailPage> {
       body: Consumer<BluetoothManager>(
         builder: (context, manager, child) {
           return ListView(
-            children: manager.messages.map((msg) => ListTile(title: Text(msg))).toList(),
+            children: manager.messages
+                .map((msg) => ListTile(title: Text(msg)))
+                .toList(),
           );
         },
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.send),
-        onPressed: () {
-          Provider.of<BluetoothManager>(context, listen: false).sendMessage("OK");
-        },
+        onPressed: () {},
       ),
     );
   }
 
   @override
   void dispose() {
-    Provider.of<BluetoothManager>(context, listen: false).disconnect();
+    _bluetoothManager.disconnect();
     super.dispose();
   }
 }

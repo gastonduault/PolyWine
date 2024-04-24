@@ -1,4 +1,3 @@
-import './bluetooth/bluetooth_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import './bluetooth/bluetooth.dart';

@@ -16,6 +16,7 @@ class Bouteille(db.Model):
     categorie = db.Column(db.String(50), nullable=False)
     date_recolte = db.Column(db.Integer, nullable=False)
     caveId = db.Column(db.Integer, db.ForeignKey('caves.id'), nullable=False)
+    emplacement = db.Column(db.Integer, nullable=False)
 
 class Cave(db.Model):
     __tablename__ = 'caves'
@@ -79,12 +80,14 @@ def get_bouteilles_by_cave(caveid):
     bouteilles_list = []
     for bouteille in bouteilles:
         bouteilles_list.append({
+            'id': bouteille.id,
             'nom': bouteille.nom,
             'cuvee': bouteille.cuvee,
             'region': bouteille.region,
             'categorie': bouteille.categorie,
             'date_recolte': bouteille.date_recolte,
-            'caveId': bouteille.caveId
+            'caveId': bouteille.caveId,
+            'emplacement': bouteille.emplacement
         })
     return jsonify({'bouteilles': bouteilles_list}), {'Content-Type': 'application/json; charset=utf-8'}
 
@@ -101,7 +104,8 @@ def add_bouteille():
             region=data['region'],
             categorie=data['categorie'],
             date_recolte=data['date_recolte'],
-            caveId=data['caveId']
+            caveId=data['caveId'],
+            emplacement=data['emplacement']
         )
         try:
             db.session.add(new_bouteille)
@@ -117,46 +121,53 @@ def add_bouteille():
 #modification d'une bouteille
 @app.route('/bouteilles/<int:bouteille_id>', methods=['POST'])
 def update_bouteille(bouteille_id):
-    bouteille = Bouteille.query.get(bouteille_id)
+    if request.method == 'POST':
+        data = request.get_json()
+        bouteille = Bouteille.query.get(bouteille_id)
 
-    if bouteille:
+        if not bouteille:
+            return jsonify({'message': 'Bouteille non trouvée'}), 404
+
         try:
-            data = request.get_json()
-
-            bouteille.nom = data['nom']
-            bouteille.cuvee = data['cuvee']
-            bouteille.region = data['region']
-            bouteille.categorie = data['categorie']
-            bouteille.date_recolte = data['date_recolte']
-            bouteille.caveId = data['caveId']
+            bouteille.nom = data.get('nom', bouteille.nom)
+            bouteille.cuvee = data.get('cuvee', bouteille.cuvee)
+            bouteille.region = data.get('region', bouteille.region)
+            bouteille.categorie = data.get('categorie', bouteille.categorie)
+            bouteille.date_recolte = data.get('date_recolte', bouteille.date_recolte)
+            bouteille.caveId = data.get('caveId', bouteille.caveId)
+            bouteille.emplacement = data.get('emplacement', bouteille.emplacement)
 
             db.session.commit()
             return jsonify({'message': 'Bouteille mise à jour avec succès!'}), 200
-        except:
+        except Exception as e:
             db.session.rollback()
-            return jsonify({'message': 'Erreur lors de la mise à jour de la bouteille'}), 500
+            error_message = f'Erreur lors de la mise à jour de la bouteille : {str(e)}'
+            print(error_message)  # Affiche l'erreur dans la console Flask
+            return jsonify({'message': error_message}), 500
         finally:
             db.session.close()
-    else:
-        return jsonify({'message': 'Bouteille non trouvée'}), 404
 
 
 #suppression bouteille
-@app.route('/bouteille/<int:bouteille_id>', methods=['DELETE'])
+@app.route('/bouteilles/<int:bouteille_id>', methods=['DELETE'])
 def delete_bouteille(bouteille_id):
-    bouteille = Bouteille.query.get(bouteille_id)
-    if bouteille:
+    if request.method == 'DELETE':
+        bouteille = Bouteille.query.get(bouteille_id)
+
+        if not bouteille:
+            return jsonify({'message': 'Bouteille non trouvée'}), 404
+
         try:
             db.session.delete(bouteille)
             db.session.commit()
             return jsonify({'message': 'Bouteille supprimée avec succès!'}), 200
-        except:
+        except Exception as e:
             db.session.rollback()
-            return jsonify({'message': 'Erreur lors de la suppression de la bouteille'}), 500
+            error_message = f'Erreur lors de la suppression de la bouteille : {str(e)}'
+            print(error_message)  # Affiche l'erreur dans la console Flask
+            return jsonify({'message': error_message}), 500
         finally:
             db.session.close()
-    else:
-        return jsonify({'message': 'Bouteille non trouvée'}), 404
 
 
 if __name__ == '__main__':

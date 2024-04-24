@@ -1,22 +1,39 @@
+import 'package:project_app/fetch/bouteille.dart';
+import './bluetooth/bluetooth_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
-import '../pages/caseBottle.dart';
+import './bluetooth/bluetooth.dart';
 import '../assets/colors.dart';
+import 'listeBottle.dart';
 import '../main.dart';
 
-class AjoutBouteille extends StatefulWidget {
-  AjoutBouteille({Key? key}) : super(key: key);
+class bottlePage extends StatefulWidget {
+  final Bouteille bouteille;
+
+  const bottlePage({Key? key, required this.bouteille}) : super(key: key);
+
   @override
-  _AjoutBouteilleState createState() => _AjoutBouteilleState();
+  _bottlePage createState() => _bottlePage();
 }
 
-class _AjoutBouteilleState extends State<AjoutBouteille> {
+class _bottlePage extends State<bottlePage> {
   String? _selectedRegion;
   late DateTime _selectedDate;
-
   TextEditingController _nomBouteilleController = TextEditingController();
   TextEditingController _cuveeBouteilleController = TextEditingController();
   TextEditingController _regionController = TextEditingController();
+  bool _isActive = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _nomBouteilleController = TextEditingController(text: widget.bouteille.nom);
+    _cuveeBouteilleController =
+        TextEditingController(text: widget.bouteille.cuvee);
+    _regionController = TextEditingController(text: widget.bouteille.Region);
+    _selectedRegion = widget.bouteille.categorie;
+    _selectedDate = DateTime(widget.bouteille.dateRecolt);
+  }
 
   @override
   void dispose() {
@@ -27,22 +44,48 @@ class _AjoutBouteilleState extends State<AjoutBouteille> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    _selectedDate = DateTime.now(); // Initialiser la date avec la date actuelle
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Ajout d'une bouteille"),
+        title: const Text("info de la bouteille"),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.delete),
+            color: Colors.red, // Couleur rouge
+            onPressed: () {
+              clickDelete(context, widget.bouteille);
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("Allumer / Eteindre"),
+                    Text("l'emplacement"),
+                    Switch(
+                      value: _isActive,
+                      onChanged: (value) {
+                        setState(() {
+                          _isActive = value;
+                        });
+                        clickEmplacement(
+                            context, widget.bouteille.emplacement, _isActive);
+                      },
+                    )
+                  ],
+                ),
+              ],
+            ),
             SizedBox(
               height: 10,
             ),
@@ -150,7 +193,7 @@ class _AjoutBouteilleState extends State<AjoutBouteille> {
                 child: Row(
                   children: [
                     Text(
-                      "Ajout Cave",
+                      "Modifier la bouteille",
                       style: TextStyle(color: font_black),
                     ),
                     SizedBox(width: 10),
@@ -158,13 +201,13 @@ class _AjoutBouteilleState extends State<AjoutBouteille> {
                       Icons.add,
                       color: font_pink,
                       size: 24.0,
-                      semanticLabel: 'ajout bouteille',
+                      semanticLabel: 'modifier bouteil',
                     ),
                   ],
                 ),
                 onPressed: () {
                   if (_validerChamps()) {
-                    clickAjoutBouteille();
+                    clickModifier(context, widget.bouteille);
                   }
                 }),
           ],
@@ -216,23 +259,112 @@ class _AjoutBouteilleState extends State<AjoutBouteille> {
     return true;
   }
 
-  void clickAjoutBouteille() async {
+  void clickDelete(BuildContext context, Bouteille bouteille) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Confirmation de suppression"),
+          content: Text("Êtes-vous sûr de vouloir supprimer cette bouteille ?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Ferme la boîte de dialogue
+              },
+              child: Text("Annuler"),
+            ),
+            TextButton(
+              onPressed: () async {
+                bool suppression = await fetchSupprimerBouteille(bouteille);
+                if (suppression) {
+                  // Si la suppression réussit, naviguez vers la page précédente ou une autre page
+                  Navigator.of(context).pop();
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => caveScreen(),
+                    ),
+                  );
+                } else {
+                  // Si la suppression échoue, affichez un message d'erreur
+                  Navigator.of(context).pop();
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text("Erreur"),
+                        content:
+                            Text("Échec de la suppression de la bouteille."),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context)
+                                  .pop(); // Ferme la boîte de dialogue
+                            },
+                            child: Text("OK"),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
+              },
+              child: Text("Confirmer"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void clickModifier(BuildContext context, Bouteille bouteille) async {
     var appState = context.read<MyAppState>();
-    var caveId = appState.caveID;
 
     appState.bouteilleEnAjout.nom = _nomBouteilleController.text;
     appState.bouteilleEnAjout.cuvee = _cuveeBouteilleController.text;
     appState.bouteilleEnAjout.Region = _regionController.text;
     appState.bouteilleEnAjout.categorie = _selectedRegion ?? "rouge";
     appState.bouteilleEnAjout.dateRecolt = _selectedDate.year;
-    appState.bouteilleEnAjout.caveId = caveId;
-    appState.bouteilleEnAjout.emplacement = 0;
+    appState.bouteilleEnAjout.caveId = bouteille.caveId;
+    appState.bouteilleEnAjout.emplacement = bouteille.emplacement;
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => caseBottle(),
-      ),
-    );
+    bool modification = await fetchModifierBouteille(appState.bouteilleEnAjout);
+
+    if (modification) {
+      print("bouteille modifié");
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => caveScreen(),
+        ),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Text('Échec de la modification de la bouteille.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Center(
+                  child: Text('OK'),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  clickEmplacement(BuildContext context, int emplacement, bool state) {
+    if (state) {
+      print('allumer l\'emplacement $emplacement');
+    } else {
+      print('éteindre l\'emplacement $emplacement');
+    }
   }
 }

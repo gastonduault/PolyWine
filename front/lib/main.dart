@@ -1,11 +1,14 @@
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'pages/home.dart';
-import 'assets/colors.dart';
+import 'package:project_app/fetch/bouteille.dart';
+
 import 'pages/bluetooth/bluetooth_manager.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter/material.dart';
+import 'assets/colors.dart';
+import 'pages/home.dart';
 
-
-void main() { runApp(MyApp()); }
+void main() {
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -16,7 +19,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (context) => MyAppState()),
         ChangeNotifierProvider(create: (context) => BluetoothManager()),
-      ], 
+      ],
       child: MaterialApp(
         title: 'Namer App',
         theme: ThemeData(
@@ -29,6 +32,20 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyAppState extends ChangeNotifier {}
-
 class BluetoothManager extends ChangeNotifier {}
+
+class MyAppState extends ChangeNotifier {
+  var caveID = null;
+  var bouteilleID = null;
+
+  Bouteille bouteilleEnAjout = Bouteille(
+      nom: "",
+      cuvee: "",
+      Region: "",
+      categorie: '',
+      dateRecolt: -1,
+      caveId: -1,
+      emplacement: -1);
+
+  bool bluetoothConnected = false;
+}

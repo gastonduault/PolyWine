@@ -260,6 +260,7 @@ class _bottlePage extends State<bottlePage> {
   }
 
   void clickDelete(BuildContext context, Bouteille bouteille) {
+    print(bouteille.emplacement);
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -275,7 +276,8 @@ class _bottlePage extends State<bottlePage> {
             ),
             TextButton(
               onPressed: () async {
-                bool suppression = await fetchSupprimerBouteille(bouteille);
+                bool suppression =
+                    await fetchSupprimerBouteille(bouteille.emplacement);
                 if (suppression) {
                   // Si la suppression réussit, naviguez vers la page précédente ou une autre page
                   Navigator.of(context).pop();

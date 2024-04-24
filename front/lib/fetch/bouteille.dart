@@ -100,9 +100,9 @@ Future<bool> fetchModifierBouteille(Bouteille bouteilleModifiee) async {
   }
 }
 
-Future<bool> fetchSupprimerBouteille(Bouteille bouteille) async {
+Future<bool> fetchSupprimerBouteille(int emplacement) async {
   final response = await http.delete(
-    Uri.parse('${url}bouteilles/${bouteille.emplacement}'),
+    Uri.parse('${url}bouteilles/emplacement/${emplacement}'),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
     },

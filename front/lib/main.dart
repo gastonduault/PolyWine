@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'pages/bluetooth/bluetooth_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
+import 'fetch/bouteille.dart';
 import 'assets/colors.dart';
 import 'pages/home.dart';
 
@@ -51,8 +52,10 @@ class BluetoothManager with ChangeNotifier {
   List<int> lastBottleArray = [];
   List<int> occupiedLocations = []; // Pour stocker les emplacements occupés
   int lastModifiedLocation = -1;
+  int lastModifiedLocation_forDelete = -1;
   bool isConnected = false;
   bool watcher = false;
+  bool pivot = true;
   Bouteille bouteilleEnAjout = Bouteille(
       nom: "",
       cuvee: "",
@@ -157,28 +160,55 @@ class BluetoothManager with ChangeNotifier {
     lastBottleArray = List.from(newBottleArray);
     nbBouteilles = newBottleArray.where((b) => b == 1).length;
 
-    // Mise à jour des emplacements occupés
+    // Mise à jour des emplacements occupé
+    var tmp_occupiedLocations = List.from(occupiedLocations);
+    print("init tmp");
+    print(tmp_occupiedLocations.length);
+
+    // if (pivot) {
+    //   pivot = false;
+    // } else {
+    //   tmp_occupiedLocations = occupiedLocations;
+    //   pivot = true;
+    // }
+
     occupiedLocations.clear();
+    print("after clear");
+    print(occupiedLocations.length);
     for (int i = 0; i < newBottleArray.length; i++) {
       if (newBottleArray[i] == 1) {
         occupiedLocations.add(i +
             1); // Supposons que l'indexation commence à 1 pour les emplacements
       }
     }
+    print("after boucle");
+    print(occupiedLocations.length);
+    print(tmp_occupiedLocations.length);
+
+    if (tmp_occupiedLocations.length > occupiedLocations.length) {
+      print("IF OK");
+      for (var i = 0; i <= occupiedLocations.length; i++) {
+        print("FOR OK");
+        if (!tmp_occupiedLocations.contains(occupiedLocations.indexOf(i))) {
+          print("SUPPRESSION");
+          await fetchSupprimerBouteille(lastModifiedLocation_forDelete);
+        }
+      }
+    }
 
     // Mise à jour du dernier emplacement modifié, si un changement a été détecté
     if (newlyModifiedLocation != null && watcher) {
-      print("PAAAAASAAAAAGE");
       lastModifiedLocation = newlyModifiedLocation;
       watcher = false;
     }
+    if (newlyModifiedLocation != null) {
+      lastModifiedLocation_forDelete = newlyModifiedLocation;
+    }
     //  else {
-    //   lastModifiedLocation ??=
-    //       occupiedLocations.isNotEmpty ? occupiedLocations.last : null;
     // }
 
     print(
-        "Mise à jour - isConnected: $isConnected - nbBouteilles: $nbBouteilles, OccupiedLocations: $occupiedLocations, LastModifiedLocation: $lastModifiedLocation");
+        "Mise à jour - isConnected: $isConnected - nbBouteilles: $nbBouteilles, OccupiedLocations: $occupiedLocations, LastModifiedLocation: $lastModifiedLocation, LastModifiedLocation for delete: $lastModifiedLocation_forDelete");
     notifyListeners(); // Notifiez les widgets consommateurs après la mise à jour de l'état
   }
 
@@ -216,6 +246,7 @@ class BluetoothManager with ChangeNotifier {
 class MyAppState extends ChangeNotifier {
   var caveID = null;
   var bouteilleID = null;
+  late Future<List<Bouteille>> futureBouteilles;
 
   Bouteille bouteilleEnAjout = Bouteille(
       nom: "",
@@ -227,4 +258,8 @@ class MyAppState extends ChangeNotifier {
       emplacement: -1);
 
   bool bluetoothConnected = false;
+
+  void actualiseList() {
+    futureBouteilles = fetchBouteilles(caveID);
+  }
 }

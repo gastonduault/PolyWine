@@ -101,66 +101,14 @@ class DeviceDetailPage extends StatefulWidget {
 }
 
 class _DeviceDetailPageState extends State<DeviceDetailPage> {
-  bool isConnected = false;
-  List<BluetoothService> services = [];
-  String receivedData = "";
   List<String> logs = []; // Ajout d'une liste pour stocker les logs
-
-  final Guid serviceUuid = Guid("0000ffe0-0000-1000-8000-00805f9b34fb");
-  final Guid characteristicUuid = Guid("0000ffe1-0000-1000-8000-00805f9b34fb");
-  BluetoothCharacteristic? characteristic;
 
   @override
   void initState() {
     super.initState();
-    connectAndDiscoverServices();
-  }
-
-  void connectAndDiscoverServices() async {
-    if (widget.device == null) return;
-    await widget.device.connect();
-    services = await widget.device.discoverServices();
-    for (var service in services) {
-      if (service.uuid == serviceUuid) {
-        for (var char in service.characteristics) {
-          if (char.uuid == characteristicUuid) {
-            characteristic = char;
-            await char.setNotifyValue(true);
-            char.value.listen((value) {
-              String receivedMessage = utf8.decode(value);
-              if (mounted) {              
-                setState(() {
-                  logs.add("Reçu : $receivedMessage");
-                  receivedData = receivedMessage;
-                });
-              }
-            });
-            break;
-          }
-        }
-      }
-    }
-    if (mounted) {
-      setState(() {
-        isConnected = true;
-      });
-    }
-    widget.onDeviceConnected();
-  }
-
-  void sendMessage(String message) async {
-    if (characteristic == null) {
-      logs.add("Caractéristique non disponible.");
-      return;
-    }
-    try {
-      await characteristic!.write(utf8.encode(message), withoutResponse: true);
-      setState(() {
-        logs.add("Envoyé : $message");
-      });
-    } catch (e) {
-      logs.add("Erreur lors de l'envoi du message : $e");
-    }
+    // Connexion au dispositif via BluetoothManager
+    final manager = Provider.of<BluetoothManager>(context, listen: false);
+    manager.connectToDevice(widget.device);
   }
 
   @override
@@ -168,53 +116,26 @@ class _DeviceDetailPageState extends State<DeviceDetailPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.device.name ?? "Unknown Device"),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => Home()));
-          },
-        ),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              itemCount: logs.length,
-              itemBuilder: (context, index) => ListTile(
-                title: Text(logs[index]),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: TextEditingController(),
-                    decoration: InputDecoration(
-                      hintText: "Type your message here",
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-                IconButton(
-                  icon: Icon(Icons.send),
-                  onPressed: () => sendMessage("OK"), // Envoie 'OK' pour initier la communication
-                ),
-              ],
-            ),
-          ),
-        ],
+      body: Consumer<BluetoothManager>(
+        builder: (context, manager, child) {
+          return ListView(
+            children: manager.messages.map((msg) => ListTile(title: Text(msg))).toList(),
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.send),
+        onPressed: () {
+          Provider.of<BluetoothManager>(context, listen: false).sendMessage("OK");
+        },
       ),
     );
   }
 
   @override
   void dispose() {
-    if (characteristic != null) {
-    characteristic?.setNotifyValue(false);  // Désactiver les notifications
-    }
+    Provider.of<BluetoothManager>(context, listen: false).disconnect();
     super.dispose();
   }
 }

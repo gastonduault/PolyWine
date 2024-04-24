@@ -20,6 +20,7 @@ class BluetoothManager with ChangeNotifier {
   int? lastModifiedLocation;  // Pour stocker le dernier emplacement modifié
   bool isConnected = false;
 
+
   Future<void> connectToDevice(BluetoothDevice device) async {
     if (connectedDevice != null && connectedDevice == device && connectedCharacteristic != null) {
       // Already connected and listening to this device
@@ -63,7 +64,7 @@ class BluetoothManager with ChangeNotifier {
   void updateCaveState(String message) {
     message = message.trim();
     if (message.isEmpty || !message.contains(':')) {
-      print("Message reçu vide ou mal formé.");
+      // print("Message reçu vide ou mal formé.");
       return;
     }
 
@@ -72,7 +73,11 @@ class BluetoothManager with ChangeNotifier {
       var numericPart = message.substring(colonIndex + 2).trim();
       try {
         List<int> currentBottleArray = numericPart.split('').map(int.parse).toList();
+        if (currentBottleArray.length == 6) { // Modifiez '6' selon le nombre d'emplacements dans votre cave
         processBottleArray(currentBottleArray);
+        } else {
+        print("Erreur: Le tableau reçu ne contient pas le nombre attendu d'éléments.");
+       }
       } catch (e) {
         print('Erreur lors de la conversion du message : $e');
       }

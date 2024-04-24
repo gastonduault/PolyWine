@@ -31,3 +31,4 @@ class MyApp extends StatelessWidget {
 
 class MyAppState extends ChangeNotifier {}
 
+class BluetoothManager extends ChangeNotifier {}

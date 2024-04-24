@@ -112,29 +112,28 @@ class BluetoothManager with ChangeNotifier {
 
   void updateCaveState(String message) {
     message = message.trim();
-    if (message.isEmpty || !message.contains(':')) {
-      // print("Message reçu vide ou mal formé.");
+    if (message.isEmpty) {
+      print("Message reçu vide.");
       return;
     }
 
-    int colonIndex = message.indexOf(": ");
-    if (colonIndex != -1 && message.length > colonIndex + 2) {
-      var numericPart = message.substring(colonIndex + 2).trim();
-      try {
-        List<int> currentBottleArray =
-            numericPart.split('').map(int.parse).toList();
-        if (currentBottleArray.length == 6) {
-          // Modifiez '6' selon le nombre d'emplacements dans votre cave
-          processBottleArray(currentBottleArray);
-        } else {
-          print(
-              "Erreur: Le tableau reçu ne contient pas le nombre attendu d'éléments.");
-        }
-      } catch (e) {
-        print('Erreur lors de la conversion du message : $e');
+    if (!RegExp(r'^\d+$').hasMatch(message)) {
+      print("Message contient des caractères non numériques : $message");
+      return;
+    }
+
+    try {
+      List<int> currentBottleArray =
+          message.split('').map(int.parse).toList();
+      if (currentBottleArray.length == 6) {
+        // Modifiez '6' selon le nombre d'emplacements dans votre cave
+        processBottleArray(currentBottleArray);
+      } else {
+        print(
+            "Erreur: Le tableau reçu ne contient pas le nombre attendu d'éléments.");
       }
-    } else {
-      print("Format du message incorrect ou message trop court.");
+    } catch (e) {
+      print('Erreur lors de la conversion du message : $e');
     }
   }
 
@@ -242,9 +241,9 @@ class BluetoothManager with ChangeNotifier {
     }
   }
 
-  void controlLED(int emplacement, bool turnOn) async {
+  void controlLED(int emplacement) async {
     if (connectedCharacteristic != null) {
-      String message = "LED $emplacement ${turnOn ? 'ON' : 'OFF'}";
+      String message = "$emplacement";
       print("Envoi du message : $message");
 
       await connectedCharacteristic!.write(utf8.encode(message), withoutResponse: true);

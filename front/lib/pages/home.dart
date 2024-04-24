@@ -11,6 +11,7 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
+    var bluetoothManager = context.watch<BluetoothManager>();
 
     return Scaffold(
       appBar: AppBar(
@@ -107,6 +108,21 @@ class Home extends StatelessWidget {
                     Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            if (bluetoothManager.isConnected)
+                              Image.asset(
+                                "lib/assets/img/connected.png",
+                                width: 16,
+                              )
+                            else
+                              Image.asset(
+                                "lib/assets/img/no-connected.png",
+                                width: 16,
+                              ),
+                          ],
+                        ),
                         Text("Vladou"),
                         SizedBox(
                           height: 5,
@@ -150,6 +166,15 @@ class Home extends StatelessWidget {
                     Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Image.asset(
+                              "lib/assets/img/no-connected.png",
+                              width: 16,
+                            )
+                          ],
+                        ),
                         Text("Souhail"),
                         SizedBox(
                           height: 5,

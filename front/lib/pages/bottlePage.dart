@@ -281,6 +281,8 @@ class _bottlePage extends State<bottlePage> {
                 if (suppression) {
                   // Si la suppression réussit, naviguez vers la page précédente ou une autre page
                   Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
@@ -334,6 +336,7 @@ class _bottlePage extends State<bottlePage> {
 
     if (modification) {
       print("bouteille modifié");
+      Navigator.of(context).pop();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(

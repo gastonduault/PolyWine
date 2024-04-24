@@ -14,9 +14,16 @@ class caveScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
+
     var caveId = appState.caveID;
-    late Future<List<Bouteille>> futureBouteilles = fetchBouteilles(caveId);
     late Future<Cave> futureCave = fetchCave(caveId);
+
+    late Future<List<Bouteille>> futureBouteilles =
+        _loadBouteilles(caveId, context);
+
+    var bluetoothManager = context.watch<BluetoothManager>();
+    bluetoothManager.caveID = appState.caveID;
+    bluetoothManager.context = context;
 
     return Scaffold(
       appBar: AppBar(
@@ -143,5 +150,11 @@ class caveScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<List<Bouteille>> _loadBouteilles(
+      int caveId, BuildContext context) async {
+    await fetchBouteilles(caveId, context);
+    return context.read<MyAppState>().futureBouteilles;
   }
 }

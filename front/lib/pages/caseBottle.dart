@@ -17,7 +17,8 @@ class caseBottle extends StatelessWidget {
     bluetoothManager.watcher = true;
 
     var caveId = appState.caveID;
-    late Future<List<Bouteille>> futureBouteilles = fetchBouteilles(caveId);
+    fetchBouteilles(caveId, context);
+    late Future<List<Bouteille>> futureBouteilles = appState.futureBouteilles;
 
     return Scaffold(
       appBar: AppBar(
@@ -37,7 +38,7 @@ class caseBottle extends StatelessWidget {
                 children: [
                   Image.asset(
                     "lib/assets/img/bluetooth.png",
-                    width: 16,
+                    width: 21,
                   ),
                   Text("Mettez la bouteille dans votre cave"),
                   ElevatedButton(
@@ -161,6 +162,8 @@ class caseBottle extends StatelessWidget {
 
     if (ajout) {
       print("bouteille ajoutée");
+      Navigator.of(context).pop();
+      Navigator.of(context).pop();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(

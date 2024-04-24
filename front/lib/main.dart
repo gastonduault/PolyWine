@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'fetch/bouteille.dart';
 import 'assets/colors.dart';
+import 'pages/listeBottle.dart';
 import 'pages/home.dart';
 
 void main() {
@@ -56,6 +57,8 @@ class BluetoothManager with ChangeNotifier {
   bool isConnected = false;
   bool watcher = false;
   bool pivot = true;
+  var caveID = null;
+  late BuildContext context;
   Bouteille bouteilleEnAjout = Bouteille(
       nom: "",
       cuvee: "",
@@ -165,13 +168,6 @@ class BluetoothManager with ChangeNotifier {
     print("init tmp");
     print(tmp_occupiedLocations.length);
 
-    // if (pivot) {
-    //   pivot = false;
-    // } else {
-    //   tmp_occupiedLocations = occupiedLocations;
-    //   pivot = true;
-    // }
-
     occupiedLocations.clear();
     print("after clear");
     print(occupiedLocations.length);
@@ -191,7 +187,17 @@ class BluetoothManager with ChangeNotifier {
         print("FOR OK");
         if (!tmp_occupiedLocations.contains(occupiedLocations.indexOf(i))) {
           print("SUPPRESSION");
-          await fetchSupprimerBouteille(lastModifiedLocation_forDelete);
+          if (caveID != null) {
+            await fetchSupprimerBouteille(lastModifiedLocation_forDelete);
+            // TODO: à changer si valeur réactive
+            // await fetchBouteilles(caveID, context);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => caveScreen(),
+              ),
+            );
+          }
         }
       }
     }
@@ -246,7 +252,7 @@ class BluetoothManager with ChangeNotifier {
 class MyAppState extends ChangeNotifier {
   var caveID = null;
   var bouteilleID = null;
-  late Future<List<Bouteille>> futureBouteilles;
+  late Future<List<Bouteille>> futureBouteilles = Future.value([]);
 
   Bouteille bouteilleEnAjout = Bouteille(
       nom: "",
@@ -258,8 +264,4 @@ class MyAppState extends ChangeNotifier {
       emplacement: -1);
 
   bool bluetoothConnected = false;
-
-  void actualiseList() {
-    futureBouteilles = fetchBouteilles(caveID);
-  }
 }

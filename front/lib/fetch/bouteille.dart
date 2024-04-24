@@ -1,6 +1,12 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'url.dart';
+import '../main.dart';
+
+import 'package:project_app/fetch/bouteille.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter/material.dart';
+import '../assets/colors.dart';
 
 class Bouteille {
   int? id; // Rendre l'attribut id nullable
@@ -37,14 +43,20 @@ class Bouteille {
   }
 }
 
-Future<List<Bouteille>> fetchBouteilles(int id) async {
+Future<void> fetchBouteilles(int id, BuildContext context) async {
+  var appState = context.watch<MyAppState>();
+
   final response = await http.get(Uri.parse('${url}cave/bouteilles/$id'));
 
   if (response.statusCode == 200) {
     final List<dynamic> bouteillesJson =
         jsonDecode(response.body)['bouteilles'];
     print(response.body);
-    return bouteillesJson.map((json) => Bouteille.fromJson(json)).toList();
+    List<Bouteille> bouteilles = bouteillesJson
+        .map((json) => Bouteille.fromJson(json))
+        .toList(); // Convertir l'Iterable en List<Bouteille>
+    appState.futureBouteilles =
+        Future.value(bouteilles); // Envelopper la liste dans une Future
   } else {
     throw Exception('Failed to load bouteilles');
   }

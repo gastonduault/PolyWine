@@ -19,24 +19,24 @@
 > - ✅ : fini 
 
 > #### USE CASES
-> 1. Se connecter à une cave à vin 🔨
->     - 1.1 Supprimer une cave à vin	🔨
+> 1. Se connecter à une cave à vin 
+>     - 1.1 Supprimer une cave à vin	
 >     - 1.2 Renommer une cave à vin 
->     - 1.3 Activer le bluetooth (s’il n’est pas activé) 🔨
-> 2. Ajouter une bouteille 🔨
->     - 2.1 scanner une bouteille 
->     - 2.2 saisir manuellement une bouteille (accessible à partir du scan)
->     - 2.3 renommer une bouteille
+>     - 1.3 Activer le bluetooth (s’il n’est pas activé) ✅
+> 2. Ajouter une bouteille 
+>     - 2.1 scanner une bouteille  
+>     - 2.2 saisir manuellement une bouteille (accessible à partir du scan) ✅
+>     - 2.3 renommer une bouteille ✅
 >     - 2.4 modifier les infos après scan
->     - 2.5 notifications lorsque la bouteille est dans la cave
->     - 2.6 la cave envoie l’emplacement ou la bouteille a été insérée
-> 3. Consulter l’état de la cave 🔨
->     - 3.1 Cliquer sur une bouteille (LED clignote, si connecter à la cave)
+>     - 2.5 notifications lorsque la bouteille est dans la cave 🔨
+>     - 2.6 la cave envoie l’emplacement ou la bouteille a été insérée 🔨
+> 3. Consulter l’état de la cave 
+>     - 3.1 Cliquer sur une bouteille (LED clignote, si connecter à la cave) 🔨
 >     - 3.2 Etat de la cave ✅
 >     - 3.3 Visuel de l’état de la cave ✅
 > 4. Sélectionner une boouteille
->     - 4.1 fiche technique de la bouteille
->     - 4.2 modifier les infos de la bouteilles
+>     - 4.1 fiche technique de la bouteille ✅
+>     - 4.2 modifier les infos de la bouteilles ✅
 
 > #### BESOINS :
 > 1. Base de données 

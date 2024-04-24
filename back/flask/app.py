@@ -121,7 +121,7 @@ def add_bouteille():
 #modification d'une bouteille
 @app.route('/bouteilles/<int:bouteille_id>', methods=['POST'])
 def update_bouteille(bouteille_id):
-    if request.method == 'PUT':
+    if request.method == 'POST':
         data = request.get_json()
         bouteille = Bouteille.query.get(bouteille_id)
 

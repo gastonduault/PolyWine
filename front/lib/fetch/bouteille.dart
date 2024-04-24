@@ -76,6 +76,7 @@ Future<bool> fetchAjouterBouteille(Bouteille nouvelleBouteille) async {
 }
 
 Future<bool> fetchModifierBouteille(Bouteille bouteilleModifiee) async {
+  print(bouteilleModifiee.id);
   final response = await http.post(
     Uri.parse(url +
         'bouteilles/${bouteilleModifiee.id}'), // Assurez-vous d'avoir un attribut id dans votre classe Bouteille

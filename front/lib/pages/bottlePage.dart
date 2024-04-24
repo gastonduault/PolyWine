@@ -228,7 +228,14 @@ class _bottlePage extends State<bottlePage> {
 
   void clickModifier(BuildContext context, Bouteille bouteille) async {
     var appState = context.read<MyAppState>();
-    appState.bouteilleEnAjout = bouteille;
+
+    appState.bouteilleEnAjout.nom = _nomBouteilleController.text;
+    appState.bouteilleEnAjout.cuvee = _cuveeBouteilleController.text;
+    appState.bouteilleEnAjout.Region = _regionController.text;
+    appState.bouteilleEnAjout.categorie = _selectedRegion ?? "rouge";
+    appState.bouteilleEnAjout.dateRecolt = _selectedDate.year;
+    appState.bouteilleEnAjout.caveId = bouteille.caveId;
+    appState.bouteilleEnAjout.emplacement = bouteille.emplacement;
 
     bool modification = await fetchModifierBouteille(appState.bouteilleEnAjout);
 

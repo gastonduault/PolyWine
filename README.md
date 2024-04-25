@@ -6,13 +6,13 @@
 > #### Vladou
 > - **[FINI]** mise en place projet flutter
 > - **[FINI]** choix plugins bluetooth
-> - **[EN COURS]** connection bluethoot flutter <> casier vin
-> - **[EN COURS]** frontend app flutter
+> - **[FINI]** connection bluethoot flutter <> casier vin
+> - **[FINI]** frontend app flutter
 
 > #### Gaston
 > - **[FINI]** Dockerisation mysql & python Flask
 > - **[FINI]** requête HTTP Flutter <> Flask
-> - **[EN COURS]** frontend app flutter
+> - **[FINI]** frontend app flutter
 
 ## Cahier des charges 
 > - 🔨 : en cours
@@ -28,10 +28,10 @@
 >     - 2.2 saisir manuellement une bouteille (accessible à partir du scan) ✅
 >     - 2.3 renommer une bouteille ✅
 >     - 2.4 modifier les infos après scan
->     - 2.5 notifications lorsque la bouteille est dans la cave 🔨
->     - 2.6 la cave envoie l’emplacement ou la bouteille a été insérée 🔨
+>     - 2.5 notifications lorsque la bouteille est dans la cave ✅
+>     - 2.6 la cave envoie l’emplacement ou la bouteille a été insérée ✅
 > 3. Consulter l’état de la cave 
->     - 3.1 Cliquer sur une bouteille (LED clignote, si connecter à la cave) 🔨
+>     - 3.1 Cliquer sur une bouteille (LED clignote, si connecter à la cave) ✅
 >     - 3.2 Etat de la cave ✅
 >     - 3.3 Visuel de l’état de la cave ✅
 > 4. Sélectionner une boouteille
@@ -46,7 +46,7 @@
 > 2. Flutter
 >    - 2.1 Visualisation de la cave ✅
 >    - 2.2 Identification Visuelle
->    - 2.3 Stockage des bouteilles ajoutées/bues sur le téléphones (si pas internet) 
+>    - 2.3 Stockage des bouteilles ajoutées/bues sur le téléphones (si pas internet) ✅
 
 
 

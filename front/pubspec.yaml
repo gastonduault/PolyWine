@@ -19,6 +19,7 @@ dependencies:
   get: ^4.6.5
   permission_handler: ^11.3.0
   flutter_blue_plus: ^1.31.16
+  flutter_launcher_icons: ^0.13.1
 
 
 dev_dependencies:
@@ -35,4 +36,9 @@ flutter:
     - family: RobotoRegular
       fonts:
         - asset: lib/assets/fonts/Roboto-Regular.ttf
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "lib/assets/img/Logo_PolyWine.png"
 

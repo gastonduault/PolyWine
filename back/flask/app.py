@@ -18,6 +18,18 @@ class Bouteille(db.Model):
     caveId = db.Column(db.Integer, db.ForeignKey('caves.id'), nullable=False)
     emplacement = db.Column(db.Integer, nullable=False)
 
+
+# class historique(db.Model):
+#     __tablename__ = 'bouteilles'
+#     id = db.Column(db.Integer, primary_key=True)
+#     nom = db.Column(db.String(50), nullable=False)
+#     cuvee = db.Column(db.String(50), nullable=False)
+#     region = db.Column(db.String(50), nullable=False)
+#     categorie = db.Column(db.String(50), nullable=False)
+#     date_recolte = db.Column(db.Integer, nullable=False)
+#     caveId = db.Column(db.Integer, db.ForeignKey('caves.id'), nullable=False)
+#     emplacement = db.Column(db.Integer, nullable=False)
+
 class Cave(db.Model):
     __tablename__ = 'caves'
     id = db.Column(db.Integer, primary_key=True)

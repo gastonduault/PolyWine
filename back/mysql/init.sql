@@ -26,6 +26,19 @@ CREATE TABLE bouteilles (
     FOREIGN KEY (caveId) REFERENCES caves(id)
 );
 
+CREATE TABLE historique (
+    id integer not null AUTO_INCREMENT,
+    nom char(50) NOT NULL,
+    cuvee char(50) NOT NULL,
+    region char(50) NOT NULL,
+    categorie char(50) NOT NULL,
+    date_recolte integer NOT NULL,
+    caveId integer not null,
+    emplacement integer,
+    primary key (id),
+    FOREIGN KEY (caveId) REFERENCES caves(id)
+);
+
 -- INSERT INTO bouteilles (nom, cuvee, region, categorie, date_recolte, caveId, emplacement) VALUES
 -- ('Chardonnay', 'Cuvée Prestige', 'Bourgogne', 'blanc', 1990, 2, 0),
 -- ('Merlot', 'Château Smith', 'Bordeaux', 'rouge', 2018, 3, 0),

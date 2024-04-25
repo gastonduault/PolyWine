@@ -126,8 +126,7 @@ class BluetoothManager with ChangeNotifier {
     }
 
     try {
-      List<int> currentBottleArray =
-          message.split('').map(int.parse).toList();
+      List<int> currentBottleArray = message.split('').map(int.parse).toList();
       if (currentBottleArray.length == 6) {
         // Modifiez '6' selon le nombre d'emplacements dans votre cave
         processBottleArray(currentBottleArray);
@@ -248,16 +247,19 @@ class BluetoothManager with ChangeNotifier {
   }
 
   void controlLED(int emplacement) async {
-    if (connectedCharacteristic != null) {
-      String message = "$emplacement";
-      print("Envoi du message : $message");
+    //   if (connectedCharacteristic != null) {
+    //     String message = "$emplacement";
+    //     print("Envoi du message allumer l'emplacement: $message");
 
-      await connectedCharacteristic!.write(utf8.encode(message), withoutResponse: true);
-      messages.add("Envoyé : $message");
-      notifyListeners();
-    } else {
-      print("Caractéristique non connectée ou indisponible.");
-    }
+    //     await connectedCharacteristic!
+    //         .write(utf8.encode(message), withoutResponse: true);
+    //     messages.add("Envoyé : $message");
+    //     notifyListeners();
+    //   } else {
+    //     print("Caractéristique non connectée ou indisponible.");
+    //   }
+    print("PAAAASSSAAAGE");
+    Provider.of<BluetoothManager>(context, listen: false).sendMessage("6");
   }
 }
 

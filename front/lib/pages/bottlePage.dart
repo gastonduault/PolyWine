@@ -1,5 +1,4 @@
 import 'package:project_app/fetch/bouteille.dart';
-import './bluetooth/bluetooth_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import './bluetooth/bluetooth.dart';
@@ -366,10 +365,13 @@ class _bottlePage extends State<bottlePage> {
   }
 
   clickEmplacement(BuildContext context, int emplacement, bool state) {
-    if (state) {
-      print('allumer l\'emplacement $emplacement');
-    } else {
-      print('éteindre l\'emplacement $emplacement');
-    }
+    Provider.of<BluetoothManager>(context, listen: false)
+        .sendMessage(emplacement.toString());
+    // var bluetoothManager = context.watch<BluetoothManager>();
+    // if (state) {
+    //   bluetoothManager.controlLED(emplacement);
+    // } else {
+    //   print('éteindre l\'emplacement $emplacement');
+    // }
   }
 }

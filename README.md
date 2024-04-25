@@ -14,17 +14,12 @@
 > - **[FINI]** requête HTTP Flutter <> Flask
 > - **[FINI]** frontend app flutter
 
-## Cahier des charges 
-> - 🔨 : en cours
-> - ✅ : fini 
-
 > #### USE CASES
 > 1. Se connecter à une cave à vin 
 >     - 1.1 Supprimer une cave à vin	
 >     - 1.2 Renommer une cave à vin 
 >     - 1.3 Activer le bluetooth (s’il n’est pas activé) ✅
 > 2. Ajouter une bouteille 
->     - 2.1 scanner une bouteille  
 >     - 2.2 saisir manuellement une bouteille (accessible à partir du scan) ✅
 >     - 2.3 renommer une bouteille ✅
 >     - 2.4 modifier les infos après scan
@@ -37,6 +32,11 @@
 > 4. Sélectionner une boouteille
 >     - 4.1 fiche technique de la bouteille ✅
 >     - 4.2 modifier les infos de la bouteilles ✅
+
+## Cahier des charges 
+> - 🔨 : en cours
+> - ✅ : fini 
+
 
 > #### BESOINS :
 > 1. Base de données 

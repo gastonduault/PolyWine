@@ -39,11 +39,11 @@ CREATE TABLE historique (
     FOREIGN KEY (caveId) REFERENCES caves(id)
 );
 
--- INSERT INTO bouteilles (nom, cuvee, region, categorie, date_recolte, caveId, emplacement) VALUES
+-- INSERT INTO historique (nom, cuvee, region, categorie, date_recolte, caveId, emplacement) VALUES
 -- ('Chardonnay', 'Cuvée Prestige', 'Bourgogne', 'blanc', 1990, 2, 0),
 -- ('Merlot', 'Château Smith', 'Bordeaux', 'rouge', 2018, 3, 0),
 -- ('Sauvignon Blanc', 'Domaine de la Vallée', 'Loire', 'blanc', 2020, 4, 0),
--- ('Cabernet Sauvignon', 'Grand Réserve', 'Languedoc', 'rouge', 2017, 5, 0),
+-- ('Cabernet Sauvignon', 'Grand Réserve', 'Languedoc', 'rouge', 2017, 5, 0);
 -- ('Pinot Noir', 'Clos du Val', 'Bourgogne', 'rouge', 1990, 1, 0),
 -- ('Riesling', 'Schloss Johannisberg', 'Alsace', 'blanc', 2020, 2, 1),
 -- ('Malbec', 'Finca La Linda', 'Mendoza', 'rouge', 2018, 3, 1),

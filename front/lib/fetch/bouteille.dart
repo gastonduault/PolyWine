@@ -126,3 +126,20 @@ Future<bool> fetchSupprimerBouteille(int emplacement) async {
     return false;
   }
 }
+
+Future<List<Bouteille>> fetchHistoriques(int id, BuildContext context) async {
+  var appState = context.read<MyAppState>();
+
+  final response = await http.get(Uri.parse('${url}cave/historique/$id'));
+
+  if (response.statusCode == 200) {
+    final List<dynamic> bouteillesJson =
+        jsonDecode(response.body)['bouteilles'];
+
+    List<Bouteille> bouteilles =
+        bouteillesJson.map((json) => Bouteille.fromJson(json)).toList();
+    return bouteilles;
+  } else {
+    throw Exception('Failed to load bouteilles');
+  }
+}

@@ -19,16 +19,16 @@ class Bouteille(db.Model):
     emplacement = db.Column(db.Integer, nullable=False)
 
 
-# class historique(db.Model):
-#     __tablename__ = 'bouteilles'
-#     id = db.Column(db.Integer, primary_key=True)
-#     nom = db.Column(db.String(50), nullable=False)
-#     cuvee = db.Column(db.String(50), nullable=False)
-#     region = db.Column(db.String(50), nullable=False)
-#     categorie = db.Column(db.String(50), nullable=False)
-#     date_recolte = db.Column(db.Integer, nullable=False)
-#     caveId = db.Column(db.Integer, db.ForeignKey('caves.id'), nullable=False)
-#     emplacement = db.Column(db.Integer, nullable=False)
+class Historique(db.Model):
+    __tablename__ = 'historique'
+    id = db.Column(db.Integer, primary_key=True)
+    nom = db.Column(db.String(50), nullable=False)
+    cuvee = db.Column(db.String(50), nullable=False)
+    region = db.Column(db.String(50), nullable=False)
+    categorie = db.Column(db.String(50), nullable=False)
+    date_recolte = db.Column(db.Integer, nullable=False)
+    caveId = db.Column(db.Integer, db.ForeignKey('caves.id'), nullable=False)
+    emplacement = db.Column(db.Integer, nullable=False)
 
 class Cave(db.Model):
     __tablename__ = 'caves'
@@ -167,18 +167,51 @@ def delete_bouteille_par_emplacement(emplacement):
     if not bouteille:
         return jsonify({'message': 'Bouteille non trouvée à cet emplacement'}), 404
 
+    # Créer un objet historique à partir de la bouteille
+    historique_entry = Historique(
+        nom=bouteille.nom,
+        cuvee=bouteille.cuvee,
+        region=bouteille.region,
+        categorie=bouteille.categorie,
+        date_recolte=bouteille.date_recolte,
+        caveId=bouteille.caveId,
+        emplacement=bouteille.emplacement
+    )
+
     try:
+        # Ajouter à l'historique
+        db.session.add(historique_entry)
+        # Supprimer la bouteille
         db.session.delete(bouteille)
         db.session.commit()
-        return jsonify({'message': 'Bouteille supprimée avec succès!'}), 200
+        return jsonify({'message': 'Bouteille supprimée avec succès et ajoutée à l\'historique!'}), 200
     except Exception as e:
         db.session.rollback()
-        error_message = f'Erreur lors de la suppression de la bouteille à l\'emplacement {emplacement} : {str(e)}'
+        error_message = f'Erreur lors de la suppression de la bouteille et de l\'ajout à l\'historique à l\'emplacement {emplacement} : {str(e)}'
         print(error_message)  # Affiche l'erreur dans la console Flask
         return jsonify({'message': error_message}), 500
     finally:
         db.session.close()
-        
+
+
+#lister les bouteilles d'une cave
+@app.route('/cave/historique/<int:caveid>', methods=['GET'])
+def get_historique_by_cave(caveid):
+    historiques = Historique.query.filter_by(caveId=caveid).all()
+    historique_liste = []
+    for historique in historiques:
+        historique_liste.append({
+            'id': historique.id,
+            'nom': historique.nom,
+            'cuvee': historique.cuvee,
+            'region': historique.region,
+            'categorie': historique.categorie,
+            'date_recolte': historique.date_recolte,
+            'caveId': historique.caveId,
+            'emplacement': historique.emplacement
+        })
+    return jsonify({'bouteilles': historique_liste}), {'Content-Type': 'application/json; charset=utf-8'}
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5001)

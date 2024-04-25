@@ -20,7 +20,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" android:maxSdkVersion="28" />
 
     <application
-        android:label="project_app"
+        android:label="PolyWine"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

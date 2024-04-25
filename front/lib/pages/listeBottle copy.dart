@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../fetch/bouteille.dart';
 import '../assets/colors.dart';
 import '../fetch/cave.dart';
-import './historique.dart';
 import './addBottle.dart';
 import 'bottleTile.dart';
 import '../main.dart';
@@ -62,7 +61,7 @@ class caveScreen extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Historique(),
+                          builder: (context) => AjoutBouteille(),
                         ),
                       );
                     },

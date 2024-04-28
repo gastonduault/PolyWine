@@ -1,10 +1,9 @@
 # PolyWine
----
 
 
 lien de la vidéo de démo :
 
-[![polywine demo](front/lib/assets/img/Logo_PolyWine.png)](https://www.youtube.com/watch?v=yAzsr4N954w)
+[![polywine demo](front/lib/assets/img/miniature.png)](https://www.youtube.com/watch?v=yAzsr4N954w)
 
 
 ## TODO

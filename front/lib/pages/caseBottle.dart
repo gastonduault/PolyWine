@@ -48,7 +48,7 @@ class caseBottle extends StatelessWidget {
                       child: Row(
                         children: [
                           Text(
-                            "Modifier la bouteille",
+                            "Bouteille ajoutée à la cave",
                             style: TextStyle(color: font_black),
                           ),
                           SizedBox(width: 10),

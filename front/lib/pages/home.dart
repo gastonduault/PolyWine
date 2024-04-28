@@ -52,7 +52,7 @@ class Home extends StatelessWidget {
                 child: Row(
                   children: [
                     Text(
-                      "Ajout Cave",
+                      "Connexion Cave",
                       style: TextStyle(color: font_black),
                     ),
                     SizedBox(width: 10),
@@ -60,7 +60,7 @@ class Home extends StatelessWidget {
                       Icons.bluetooth,
                       color: font_pink,
                       size: 24.0,
-                      semanticLabel: 'Connection bluetooth',
+                      semanticLabel: 'Connexion bluetooth',
                     ),
                   ],
                 ),
@@ -81,7 +81,9 @@ class Home extends StatelessWidget {
           Row(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [Text("Caves ajoutés", style: TextStyle(fontSize: 17))],
+            children: [
+              Text("Caves sauvegardées", style: TextStyle(fontSize: 17))
+            ],
           ),
           SizedBox(
             height: 5,

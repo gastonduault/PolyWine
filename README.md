@@ -1,76 +1,58 @@
 # PolyWine
 
+## 📌 Description
+
+**PolyWine** is a mobile application developed with **Flutter** and a **Flask API**, designed to manage a **smart wine cellar**. The application runs on **iOS and Android** and integrates with a physical wine cellar connected via a **Raspberry Pi** in bluetooth🛜.
+
 [![polywine demo](front/lib/assets/img/miniature.png)](https://www.youtube.com/watch?v=yAzsr4N954w)
 
-> #### USE CASES
-> 1. Se connecter à une cave à vin 
->     - 1.1 Supprimer une cave à vin	
->     - 1.2 Renommer une cave à vin 
->     - 1.3 Activer le bluetooth (s’il n’est pas activé) ✅
-> 2. Ajouter une bouteille
->     - 2.1 Scan de la bouteille par photo
->     - 2.2 saisir manuellement une bouteille (accessible à partir du scan) ✅
->     - 2.3 renommer une bouteille ✅
->     - 2.4 modifier les infos après scan
->     - 2.5 notifications lorsque la bouteille est dans la cave ✅
->     - 2.6 la cave envoie l’emplacement ou la bouteille a été insérée ✅
-> 4. Consulter l’état de la cave 
->     - 3.1 Cliquer sur une bouteille (LED clignote, si connecter à la cave) ✅
->     - 3.2 Etat de la cave ✅
->     - 3.3 Visuel de l’état de la cave ✅
->     - 3.4 chatbot sommelier
->     - 3.5 Historique ✅
-> 5. Sélectionner une boouteille
->     - 4.1 fiche technique de la bouteille ✅
->     - 4.2 modifier les infos de la bouteilles ✅
->     - 4.3 Donner un avis sur la bouteille
+## 🎨 UI Design (Figma)
 
-## Cahier des charges 
-> - 🔨 : en cours
-> - ✅ : fini 
+[View Figma Designs](https://www.figma.com/proto/3vyjWRazGmI9xCGPG7ij4v?node-id=0-1&t=0FpNm5Ffpij5tY2E-6)
 
+## 🚀 Installation & Setup
 
-> #### BESOINS :
-> 1. Base de données 
->	    - 1.1 stockage des cave ✅
->	    - 1.2 stockage des bouteilles ✅
->	    - 1.3 stockage des bouteilles bues ✅
-> 2. Flutter
->    - 2.1 Visualisation de la cave ✅
->    - 2.2 Identification Visuelle
->    - 2.3 Stockage des bouteilles ajoutées/bues sur le téléphones (si pas internet) 
+### 📦 **Docker Setup**
+#### Ensure you have **Docker** installed and run the following command:
+```bash
+docker-compose up --build
+```
 
+#### if port **error** `3306`:
+` ERROR: for mysql  Cannot start service mysql: driver failed programming external connectivity on endpoint mysql`
 
+Do next commands:
 
+```bash
+sudo service mysql stop 
+sudo lsof -i :5000
+sudo kill -9 PID processus_on_port 3306
+sudo docker-compose restart
+sudo docker-compose up
+```
 
-## BACK
+### 🚀 Flutter Setup
 
->#### endpoints :
->>-  **[POST]** `api/login`
->>      - *send* **json**: `{username, password}`
->>      - *receive* **json**: `{[id_cave, nom_cave]}`
->
->>- **[POST]** `api/signin`
->>     - *send* **json**: `{username, password}`
->
->>- **[POST]** `api/login/cave`
->>     - *send* **json**: `{id_cave}`
->
->>- **[GET]** `api/cave/id`
->>     - Listes des bouteilles
->>     - Nom de la cave (Propriétaire)
->
->>- **[GET]** `api/cave/bouteille/id` 
->>     - Plus d'information sur la bouteille
->>     - *send* **json**: `{id_bouteille}`
->
->>- **[POST]** `api/cave/bouteille`
->>     - ajout / modification d'une bouteille
->>     - *send* **json**: `{nom, region, cuvee, type, annee, url_image}`
->
->>- **[DELETE]** `api/cave/bouteille/id`
->>     - supression d'une bouteille
->>     - *send* **json**: `{id_bouteille}` 
->
->>- **[GET]** `api/cave/historique`
->>     - *send* **json**: `{id_cave}` 
+#### Check Flutter SDK
+```bash
+flutter doctor
+```
+
+#### Run the application
+```bash
+flutter run ./front/lib/main.dart
+```
+
+#### Si erreur de dépendance : que flutter ne trouve pas les paquets (exemple: provider)
+```bash
+cd front
+flutter clean
+flutter pub get
+```
+#### flutter http 🔗 api flask
+*change the url in the file `front/lib/pages/fetch/url.dart`*
+```
+final String url = 'http://my_ip:5001/';
+```
+
+   
